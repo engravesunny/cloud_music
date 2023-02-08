@@ -1,48 +1,64 @@
 <template>
-    <!-- 顶部区域 -->
+    <div class="main_body">
+        <!-- 顶部区域 -->
 
-        <!-- Navbar区域 -->
-        <Navbar></Navbar>
-        <!-- Navbar区域 -->
+            <!-- Navbar区域 -->
 
-    <!-- 顶部区域 -->
+            <Navbar></Navbar>
 
-    <!-- 主体区域 -->
+            <!-- Navbar区域 -->
 
-        <!-- 左侧边栏 -->
-        <!-- 左侧边栏 -->
+        <!-- 顶部区域 -->
 
-        <!-- 二级路由 -->
-            <router-view></router-view>
-        <!-- 二级路由 -->
+        <!-- 主体区域 -->
 
-    <!-- 主体区域 -->
+            <div class="main">
+                         
+                <!-- 左侧边栏 -->
+                <Sidebar></Sidebar>
+                <!-- 左侧边栏 -->
 
-    <!-- 底部区域 -->
+                <!-- 二级路由/内容区域 -->
+                <div class="main_container">
+                    <router-view></router-view>
+                </div>                  
+                <!-- 二级路由 -->
 
-        <!-- 歌曲封面 -->
-        <!-- 歌曲封面 -->
+            </div>
 
-        <!-- 上一曲、暂停、下一曲 -->
-        <!-- 上一曲、暂停、下一曲 -->
+        <!-- 主体区域 -->
 
-        <!-- 进度条、时间 -->
-        <!-- 进度条、时间 -->
+        <!-- 底部区域 -->
 
-        <!-- 播放模式 -->
-        <!-- 播放模式 -->
+            <Footer></Footer>
 
-        <!-- 音量 -->
-        <!-- 音量 -->
-
-        <!-- 播放列表 -->
-        <!-- 播放列表 -->
-
-    <!-- 底部区域 -->
+        <!-- 底部区域 -->
+    </div>
 </template>
 
 <script setup>
-import Navbar from './components/Navbar.vue';
-
-
+import Navbar from './components/Navbar/index.vue';
+import Sidebar from './components/Sidebar/index.vue';
+import Footer from './components/Footer/index.vue'
 </script>
+
+<style lang="less" scoped>
+.main_body{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    .main{
+        flex: 1;
+        display: flex;
+        padding-top: 60px;
+        box-sizing: border-box;
+        height: 100%;
+        background-color: pink;
+        .main_container{
+            flex: 1;
+        }
+    }
+}
+
+</style>
