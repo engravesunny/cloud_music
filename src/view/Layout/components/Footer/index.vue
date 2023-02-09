@@ -25,7 +25,11 @@
 .footer{
     display: flex;
     width: 100%;
+    min-width: 900px;
     height: 75px;
     background-color: red;
+    position: fixed;
+    bottom: 0;
+    left: 0;
 }   
 </style>

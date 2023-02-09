@@ -1,14 +1,210 @@
 <template>
     <!-- 侧边栏 -->
-        <div class="sidebar unselectable">侧边栏</div>
+    <div class="hidden">
+        <div class="container">
+            <div class="sidebar unselectable">
+
+                <!-- 使用v-for渲染左边栏按钮 -->
+                <div class="side_top">
+                    <div 
+                        :class="{side_cell:true,active:item.active}" 
+                        v-for="item in sideCellList" 
+                        :key="item.name"
+                        @click="toCell(item)"
+                    >
+                        {{ item.name }}
+                    </div>
+                </div>
+                <!-- 使用v-for渲染左边栏按钮 -->
+
+                <div class="side_bottom">
+                    <el-collapse>
+                        <el-collapse-item class="song_list" style="font-size: 18px;" title="创建的歌单">
+                            <div class="songList_cell" v-for="item in createSongList" :key="item.id">
+                                {{ item.name }}
+                            </div>
+                        </el-collapse-item>
+                        <el-collapse-item class="song_list" title="收藏的歌单">
+                            <div class="songList_cell" v-for="item in collectSonglist" :key="item.id">
+                                {{ item.name }}
+                            </div>
+                        </el-collapse-item>
+                    </el-collapse>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- 侧边栏 -->
 </template>
 
+<script setup>
+
+// 左侧栏上部分按钮
+let sideCellList = reactive([
+    {
+        name:'我的收藏',
+        active:true, //默认展示我的收藏
+        path:'/myLike'
+    },
+    {
+        name:'每日推荐',
+        active:false,
+        path:'/suggestSong' 
+    },
+    {
+        name:'私人FM',
+        active:false,
+        path:'/privateFM' 
+    },
+    {
+        name:'播放历史',
+        active:false,
+        path:'/playHistory' 
+    }
+])
+
+// 左侧栏上部分点击事件函数
+const toCell = (item) => {
+    sideCellList.forEach(item => {
+        item.active = false
+    });
+    item.active = true
+}
+
+// 左侧栏下部分
+let createSongList = reactive([
+    {
+        id:'1',
+        name:'歌单名测试'
+    },
+    {
+        id:'2',
+        name:'歌单名测试'
+    },{
+        id:'3',
+        name:'歌单名测试'
+    },{
+        id:'4',
+        name:'歌单名测试'
+    },{
+        id:'5',
+        name:'歌单名测试'
+    },{
+        id:'6',
+        name:'歌单名测试'
+    },
+])
+
+let collectSonglist = reactive([
+{
+        id:'1',
+        name:'歌单名测试'
+    },
+    {
+        id:'2',
+        name:'歌单名测试'
+    },{
+        id:'3',
+        name:'歌单名测试'
+    },{
+        id:'4',
+        name:'歌单名测试'
+    },{
+        id:'5',
+        name:'歌单名测试'
+    },{
+        id:'6',
+        name:'歌单名测试'
+    },
+])
+
+</script>
+
+
+
 <style lang="less" scoped>
+.hidden{
+    width: 200px;
+    height: 100%;
+    overflow: hidden;
+    padding-bottom: 75px;
+    box-sizing: border-box;
+    box-shadow: 0 0 1px 0 #000;
+}
+.container{
+    width: 220px;
+    height: 100%;
+    background-color: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 .sidebar{
     display: flex;
-    width: 300px;
-    height: 100%;
-    background-color: skyblue;
+    flex-wrap: wrap;
+    flex-direction:column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 200px;
+    .side_top{
+        padding-left: 5px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-start;
+        flex-direction: column;
+        flex-wrap: wrap;
+        width: 100%;
+        height: 200px;
+        .side_cell{
+            width: 97%;
+            box-sizing: border-box;
+            padding: 10px 10px;
+            font-size: 18px;
+            font-weight: 100;
+            border-radius: 5px;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+        .side_cell:hover{
+            background-color: rgb(240, 231, 232);
+        }
+        .active{
+            font-size: 20px;
+            font-weight: 500;
+            background-color: rgb(240, 231, 232);
+        }
+    }  
+    .side_bottom{
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        padding: 20px 0;
+        box-sizing: border-box;
+        .song_list{
+            padding:0 10px;
+            width: 180px;
+            border: 0;
+            font-size: 18px;
+            .songList_cell{
+                width: 97%;
+                box-sizing: border-box;
+                padding: 10px 10px;
+                font-size: 16px;
+                font-weight: 100;
+                border-radius: 5px;
+                transition: all 0.1s;
+                cursor: pointer;
+            }
+        }
+        .el-collapse{
+            border: 0;
+            padding-right: 10px;
+        }
+        .el-collapse-item__header{
+            border: 0;
+        }
+    }
 }
 </style>

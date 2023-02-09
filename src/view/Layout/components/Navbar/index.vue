@@ -40,8 +40,10 @@ import User from './components/User.vue'
     top: 0;
     left: 0;
     width: 100%;
+    min-width: 900px;
     height: 60px;
     background: #fff;
+    box-shadow: 0px 0px 1px 0px #000;
     .logo{
         display: flex;
         float: left;

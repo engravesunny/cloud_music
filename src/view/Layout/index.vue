@@ -48,13 +48,14 @@ import Footer from './components/Footer/index.vue'
     flex-direction: column;
     justify-content: space-between;
     height: 100vh;
+    min-height:500px;
+    min-width: 900px;
     .main{
         flex: 1;
         display: flex;
         padding-top: 60px;
         box-sizing: border-box;
         height: 100%;
-        background-color: pink;
         .main_container{
             flex: 1;
         }
