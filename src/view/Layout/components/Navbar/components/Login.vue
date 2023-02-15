@@ -49,7 +49,7 @@ const props = defineProps({
 })
 
 // 子向父传值
-const emit = defineEmits(['update:num'])
+const emit = defineEmits(['update:showLoginBox'])
 const updateStatus = status=>{
   emit('update:showLoginBox',status)
 }
@@ -99,6 +99,7 @@ onMounted(async ()=>{
             userInfo.user_name = data.nickname
         } else if(data.code === 803){
             qrStatus.value = '登陆成功'
+            document.cookie=data.cookie
             clearInterval(qrTimer)
             const timer = setTimeout(()=>{
                 // 更新状态
