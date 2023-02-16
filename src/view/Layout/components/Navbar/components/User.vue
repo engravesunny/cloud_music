@@ -5,7 +5,7 @@
             <!-- 用户头像 -->
             <div class="user_avatar unselectable" >
                 <!-- 登录后 -->
-                <img v-if="user_avatar" @click="down_menu_show=!down_menu_show" :src="user_avatar" alt="">
+                <img v-if="userInfos.avatarUrl" @click="down_menu_show=!down_menu_show" :src="userInfos.avatarUrl" alt="">
                 <!-- 未登录 -->
                 <img v-else @click="login" src="@/assets/img/default_avatar.png" alt="">
             </div>
@@ -13,13 +13,13 @@
 
             <!-- 用户昵称 -->
             <!-- 已登录 -->
-            <div v-if="user_name" class="user_name unselectable" @click="down_menu_show=!down_menu_show">{{ user_name }}</div>
+            <div v-if="userInfos.nickname" class="user_name unselectable" @click="down_menu_show=!down_menu_show">{{ userInfos.nickname }}</div>
             <!-- 未登录 -->
             <div v-else @click="login" class="user_name unselectable"> 请登录 </div>
             <!-- 用户昵称 -->
 
             <!-- 下拉图标 -->
-            <el-icon v-if="user_name" :size="15" style="cursor: pointer;" @click="down_menu_show=!down_menu_show"><ArrowDown /></el-icon>
+            <el-icon v-if="userInfos.nickname" :size="15" style="cursor: pointer;" @click="down_menu_show=!down_menu_show"><ArrowDown /></el-icon>
             <!-- 下拉图标 -->
 
             <!-- 下拉菜单 -->
@@ -32,7 +32,7 @@
                         <li>
                             关于
                         </li>
-                        <li>
+                        <li @click="Logout">
                             退出登录
                         </li>
                     </ul>
@@ -43,7 +43,7 @@
 
         <!-- 登录窗口 -->
 
-        <Login v-if="showLoginBox" v-model:showLoginBox="showLoginBox"></Login>
+        <Login v-if="showLoginBox" v-model:showLoginBox="showLoginBox" ></Login>
 
         <!-- 登录窗口 -->
     </div>
@@ -51,17 +51,43 @@
 
 <script setup>
 import Login from './Login.vue'
+import { logout } from '../../../../../api/user';
+import { user } from '@/store/user';
+import { storeToRefs } from 'pinia';
+import { ElMessage } from 'element-plus'
+import { onMounted, reactive } from '@vue/runtime-core';
+const userStore = user()
+const { getUserInfo, userInfo } = storeToRefs(userStore)
+let userInfos = reactive({
+    nickname:'',
+    avatarUrl:''
+})
+onMounted(()=>{
+    if(localStorage.getItem('userInfo')){
+        userInfos.nickname = JSON.parse(localStorage.getItem('userInfo')).nickname
+        userInfos.avatarUrl = JSON.parse(localStorage.getItem('userInfo')).avatarUrl
+        console.log(userInfos);
+    }
+})
 
-
-let user_name = ref('')
-let user_avatar = ref('')
 let down_menu_show = ref(false)
 let showLoginBox = ref(false)
 const login = () => {
     showLoginBox.value = true
-    // 调用接口
-    user_name.value = '若知是梦何须醒'
-    user_avatar.value = 'src/assets/img/avatar.jpg'
+}
+const Logout =async () => {
+    const {data} = await logout()
+    if(data.code === 200){
+        localStorage.removeItem('userInfo')
+        localStorage.removeItem('CLOUD_MUSIC')
+        userInfos.nickname = ''
+        userInfos.avatarUrl = ''
+        ElMessage({
+            message: '登出成功',
+            type: 'success',
+        })
+    }
+    console.log(res);
 }
 </script>
 

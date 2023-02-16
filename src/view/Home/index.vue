@@ -1,10 +1,25 @@
 <template>
     <div class="home_container unselectable">
         <span>首页</span>
+        {{ getUserInfo.nickname }}
+        <el-button @click="changeNum">改变</el-button>
     </div>
 </template>
 
 <script setup>
+import { onMounted } from '@vue/runtime-core'
+import { user } from '../../store/user'
+import { storeToRefs } from 'pinia'
+
+const userStore = user()
+let { userInfo, getUserInfo } = storeToRefs(userStore)
+const changeNum = () => {
+    console.log(getUserInfo)
+}
+
+onMounted(()=>{
+    console.log(1)
+})
 
 const login =async ()=>{
     const res = await sendCode({

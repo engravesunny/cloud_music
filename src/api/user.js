@@ -45,3 +45,9 @@ export const qrCheck = params => request({
     url:'/login/qr/check',
     params
 })
+
+// 退出登录
+
+export const logout = () => request({
+    url:"/logout"
+})

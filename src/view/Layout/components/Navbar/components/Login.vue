@@ -5,14 +5,14 @@
 
                 <!-- 登录logo -->
                 <div class="login_logo">
-                    <img v-if="userInfo.user_avatar" :src="userInfo.user_avatar" alt="">
+                    <img v-if="userInfos.user_avatar" :src="userInfos.user_avatar" alt="">
                     <img v-else src="@/assets/img/logo.png" alt="">
                 </div>
                 <!-- 登录logo -->
 
                 <!-- 登录标题 -->
                 <div class="login_title">
-                    <h3>欢迎回来{{ userInfo.user_name?'，' + userInfo.user_name:"" }}</h3>
+                    <h3>欢迎回来{{ userInfos.user_name?'，' + userInfos.user_name:"" }}</h3>
                 </div>
                 <!-- 登录标题 -->
 
@@ -39,7 +39,15 @@
 import { qrKey, qrCreate, qrCheck } from '@/api/user.js'
 import { reactive } from '@vue/reactivity'
 import QRCode from 'qrcode'
-
+import { ElMessage } from 'element-plus'
+import { user } from '@/store/user'
+import { storeToRefs } from 'pinia'
+import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
+const router = useRouter()
+console.log(route,router);
+const userStore = user()
+let { userInfo, getUserInfo } = storeToRefs(userStore)
 // 接收父组件传来的值
 const props = defineProps({
   showLoginBox:{
@@ -64,7 +72,7 @@ const generateQR = async text => {
 }
 
 // 用户信息
-let userInfo = reactive({
+let userInfos = reactive({
     user_name:'',
     user_avatar:''
 })
@@ -95,11 +103,27 @@ onMounted(async ()=>{
             // cookie: ""
             // message: "授权中"
             // nickname: "若知是梦何须醒_aWab"
-            userInfo.user_avatar = data.avatarUrl
-            userInfo.user_name = data.nickname
+            userInfos.user_avatar = data.avatarUrl
+            userInfos.user_name = data.nickname
+            // 添加localStorage
+            const localInfo = JSON.stringify(data)
+            localStorage.setItem('userInfo',localInfo)
         } else if(data.code === 803){
             qrStatus.value = '登陆成功'
+            ElMessage({
+                message:'登陆成功',
+                type:'success'
+            })
+
+            // 添加cookie
             document.cookie=data.cookie
+            // 添加cookie到token
+            localStorage.setItem('CLOUD_MUSIC',data.cookie)
+            userInfo.value.nickname = userInfos.user_name
+            userInfo.value.avatarUrl = userInfos.user_avatar
+            userInfo.value.cookie = data.cookie
+            router.go(0)  // 刷新页面
+            console.log(userInfo);
             clearInterval(qrTimer)
             const timer = setTimeout(()=>{
                 // 更新状态
