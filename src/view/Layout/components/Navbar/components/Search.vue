@@ -10,32 +10,95 @@
 
             <!-- 搜索输入区域 -->
             <div class="search_input unselectable">
-                <input type="text" v-model="searchText" :placeholder="placeholder" @keydown.enter="fn">
+                <input type="text" v-model="searchText" :placeholder="placeholder" @keydown.enter="fn" @input="searchSuggestFn" @focus="showSuggest = true">
             </div>
             <!-- 搜索输入区域 -->
 
         </div>
-        <div v-if="suggestList.length" class="suggest">
-            <div class="suggest_title">猜你想搜</div>
-            <ul>
-                <li class="suggest_cell" v-for="(item,index) in suggestList" :key="index">
-                    {{ item }}
-                </li>
-            </ul>
+        <div v-if="showSuggest" @click="showSuggest = false" style="width:100vw;height:100vh;position:fixed;top:0;left:0;">
+            <div v-if="showSuggest" class="suggest">
+                <div class="suggest_title">猜你想搜</div>
+                    <ul v-if="suggestList.length">
+                        <li class="suggest_cell" v-for="item in suggestList" :key="item.id" @click="suggestSearch(item.name)">
+                            {{ item.name }}{{  item.artists.length? ' - ':'' }}
+                            <span v-for="artist in item.artists" :key="artist.id">{{ artist.name+' ' }}</span>
+                        </li>
+                    </ul>
+                    <ul v-else>
+                        <li class="suggest_cell" v-for="item in hotSong" :key="item.first" @click="suggestSearch(item.first)">
+                            {{ item.first }}
+                        </li>
+                    </ul>
+                </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive } from "@vue/reactivity";
+import { reactive, ref } from "@vue/reactivity";
+// 引入搜索api接口
+import { searchDefault, searchHot, searchSuggest, searchResult, search } from '@/api/search.js'
+import { onMounted } from "@vue/runtime-core";
 
 // 搜索功能
-let placeholder = ref('春节名曲 过年必备')
+let placeholder = ref('')
 let searchText = ref('')
+let showSuggest = ref(false)
+let hotSong = reactive([])
+// 初始化
+onMounted(async ()=>{
+    const { data } = await searchDefault()
+    placeholder.value = data.data.showKeyword
+    const res = await searchHot()
+    if(res.data.result){
+        res.data.result.hots.forEach(item=>{
+            hotSong.push(item)
+        })
+    }
+    console.log(hotSong);
+})
+
+// 搜索enter键
 const fn = () => {
-    console.log(searchText.value);
+    if(searchText.value){
+        // 输入了搜索输入的关键词
+    } else {
+        // 搜索placeholder
+    }
 }
+
+
 let suggestList = reactive([])
+
+
+// 搜索建议input事件
+let searchSuggestFn = async() => {
+    // 显示suggest列表
+    showSuggest.value = true
+
+    // 获取searchSuggest
+
+    //置空suggest列表
+    suggestList.length = 0
+
+    if(!searchText.value)return;
+    const {data} = await searchSuggest({
+        keywords:searchText.value
+    })
+    if(data.result){
+        data.result.songs.forEach(item=>{
+            suggestList.push(item)
+        })
+    }
+}
+
+// 点击搜索建议搜索
+let suggestSearch = async(name)=>{
+    const res = await search({
+        keywords:name
+    })
+    console.log('search',res);
+}
 </script>
 
 <style lang="less" scoped>
@@ -77,8 +140,8 @@ let suggestList = reactive([])
     }
     .suggest{
         position: absolute;
-        top: 50px;
-        left: 0;
+        top: 60px;
+        left: 370px;
         width: 400px;
         max-height: 80vh;
         border-radius: 10px;
