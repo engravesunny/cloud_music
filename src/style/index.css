@@ -7,3 +7,6 @@
 img{
     -webkit-user-drag: none;
 }
+body{
+    min-width: 1063px;
+}

@@ -87,7 +87,6 @@ const Logout =async () => {
             type: 'success',
         })
     }
-    console.log(res);
 }
 </script>
 

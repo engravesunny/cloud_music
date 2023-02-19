@@ -18,7 +18,7 @@ const changeNum = () => {
 }
 
 onMounted(()=>{
-    console.log(1)
+    
 })
 
 const login =async ()=>{

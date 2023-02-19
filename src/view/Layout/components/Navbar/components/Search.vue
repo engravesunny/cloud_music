@@ -3,14 +3,14 @@
         <div class="search_outline">
 
             <!-- 搜索图标 -->
-            <div class="search_icon unselectable">
+            <div class="search_icon unselectable" @click="fnSearch">
                 <el-icon><Search style="width: 30px; height: 30px;cursor: pointer;" /></el-icon>
             </div>
             <!-- 搜索图标 -->
 
             <!-- 搜索输入区域 -->
             <div class="search_input unselectable">
-                <input type="text" v-model="searchText" :placeholder="placeholder" @keydown.enter="fn" @input="searchSuggestFn" @focus="showSuggest = true">
+                <input type="text" v-model="searchText" :placeholder="placeholder" @keydown.enter="fnSearch" @input="searchSuggestFn" @focus="showSuggest = true">
             </div>
             <!-- 搜索输入区域 -->
 
@@ -18,13 +18,13 @@
         <div v-if="showSuggest" @click="showSuggest = false" style="width:100vw;height:100vh;position:fixed;top:0;left:0;">
             <div v-if="showSuggest" class="suggest">
                 <div class="suggest_title">猜你想搜</div>
-                    <ul v-if="suggestList.length">
+                    <ul v-if="suggestList.length&&showSuggest">
                         <li class="suggest_cell" v-for="item in suggestList" :key="item.id" @click="suggestSearch(item.name)">
                             {{ item.name }}{{  item.artists.length? ' - ':'' }}
                             <span v-for="artist in item.artists" :key="artist.id">{{ artist.name+' ' }}</span>
                         </li>
                     </ul>
-                    <ul v-else>
+                    <ul v-if="!suggestList.length&&showSuggest">
                         <li class="suggest_cell" v-for="item in hotSong" :key="item.first" @click="suggestSearch(item.first)">
                             {{ item.first }}
                         </li>
@@ -39,7 +39,9 @@ import { reactive, ref } from "@vue/reactivity";
 // 引入搜索api接口
 import { searchDefault, searchHot, searchSuggest, searchResult, search } from '@/api/search.js'
 import { onMounted } from "@vue/runtime-core";
-
+import { useRoute, useRouter } from "vue-router";
+const router = useRouter()
+const route = useRoute()
 // 搜索功能
 let placeholder = ref('')
 let searchText = ref('')
@@ -55,19 +57,32 @@ onMounted(async ()=>{
             hotSong.push(item)
         })
     }
-    console.log(hotSong);
 })
 
-// 搜索enter键
-const fn = () => {
+// 搜索enter键或按搜索图标
+const fnSearch = () => {
+    showSuggest.value = false
     if(searchText.value){
         // 输入了搜索输入的关键词
+        router.push({
+            path:'/search',
+            query:{
+                searchValue:searchText.value
+            }
+        })
+
     } else {
         // 搜索placeholder
+        router.push({
+            path:'/search',
+            query:{
+                searchValue:placeholder.value
+            }
+        })
     }
 }
 
-
+// 搜索建议列表
 let suggestList = reactive([])
 
 
@@ -147,7 +162,7 @@ let suggestSearch = async(name)=>{
         border-radius: 10px;
         overflow: hidden;
         box-shadow:3px 0 5px -5px #000;
-        background-color: #fff;
+        background: rgba(242, 229, 229, 0.8);
         .suggest_title{
             padding:10px 10px 10px 10px;
             font-size: 20px;
