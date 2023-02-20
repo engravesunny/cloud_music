@@ -15,6 +15,8 @@
             <!-- 搜索输入区域 -->
 
         </div>
+
+        <!-- 搜索建议区域 -->
         <div v-if="showSuggest" @click="showSuggest = false" style="width:100vw;height:100vh;position:fixed;top:0;left:0;">
             <div v-if="showSuggest" class="suggest">
                 <div class="suggest_title">猜你想搜</div>
@@ -109,10 +111,12 @@ let searchSuggestFn = async() => {
 
 // 点击搜索建议搜索
 let suggestSearch = async(name)=>{
-    const res = await search({
-        keywords:name
-    })
-    console.log('search',res);
+    router.push({
+            path:'/search',
+            query:{
+                searchValue:name
+            }
+        })
 }
 </script>
 
@@ -162,7 +166,7 @@ let suggestSearch = async(name)=>{
         border-radius: 10px;
         overflow: hidden;
         box-shadow:3px 0 5px -5px #000;
-        background: rgba(242, 229, 229, 0.8);
+        background: rgba(252, 249, 249, 1);
         .suggest_title{
             padding:10px 10px 10px 10px;
             font-size: 20px;

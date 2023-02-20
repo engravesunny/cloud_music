@@ -1,23 +1,36 @@
 <template>
-    <div class="search_container unselectable">
-        <div class="search_title unselectable">
-            搜索 <span style="font-size:21px">{{ testSearchText }}</span>
-        </div>
-        <div class="search_type_option">
-            <ul class="type_list">
-                <li :class="{active: searchType===1}" @click="e=>changeSearchType(e)">单曲</li>
-                <li :class="{active: searchType===1000}" @click="e=>changeSearchType(e)">歌单</li>
-                <li :class="{active: searchType===100}" @click="e=>changeSearchType(e)">歌手</li>
-                <li :class="{active: searchType===10}" @click="e=>changeSearchType(e)">专辑</li>
-                <li :class="{active: searchType===1014}" @click="e=>changeSearchType(e)">视频</li>
-                <li :class="{active: searchType===1009}" @click="e=>changeSearchType(e)">播客</li>
-                <li :class="{active: searchType===1002}" @click="e=>changeSearchType(e)">用户</li>
-            </ul>
-        </div>
-        <div class="search_result">
-            <keep-alive>
-                <component :is="searchTypeComponent"></component>
-            </keep-alive>
+    <div class="hidden">
+        <div class="container">
+            <div class="search_container unselectable">
+                <!-- 搜索关键词提示 -->
+                <div class="search_title unselectable">
+                    搜索 <span style="font-size:21px">{{ testSearchText }}</span>
+                </div>
+                <!-- 搜索关键词提示 -->
+
+                <!-- 搜索类型栏 -->
+                <div class="search_type_option">
+                    <ul class="type_list">
+                        <li :class="{active: searchType===1}" @click="e=>changeSearchType(e)">单曲</li>
+                        <li :class="{active: searchType===1000}" @click="e=>changeSearchType(e)">歌单</li>
+                        <li :class="{active: searchType===100}" @click="e=>changeSearchType(e)">歌手</li>
+                        <li :class="{active: searchType===10}" @click="e=>changeSearchType(e)">专辑</li>
+                        <li :class="{active: searchType===1014}" @click="e=>changeSearchType(e)">视频</li>
+                        <li :class="{active: searchType===1009}" @click="e=>changeSearchType(e)">播客</li>
+                        <li :class="{active: searchType===1002}" @click="e=>changeSearchType(e)">用户</li>
+                    </ul>
+                </div>
+                <!-- 搜索类型栏 -->
+
+                <!-- 搜索结果 -->
+                <div class="search_result">
+                    <keep-alive>
+                        <component v-loading="!searchResult.length" :is="searchTypeComponent" :currentPages="searchPage" :result="searchResult" :songTotal="songTotal" @updatePage="changePage"></component>
+                    </keep-alive>
+                </div>
+                <!-- 搜索结果 -->
+
+            </div>
         </div>
     </div>
 </template>
@@ -34,15 +47,28 @@ import cloudUser from './components/cloudUser/index.vue'
 import video from './components/video/index.vue'
 import podcasts from './components/podcasts/index.vue'
 const route = useRoute()
-
+const router = useRouter()
 // 搜索关键词展示
 const testSearchText = ref('关键词')
-
 // 搜索结果
-const searchResult = reactive([])
+let searchResult = reactive([])
 // 搜索类型
 const searchType = ref(1)
 const searchTypeComponent = shallowRef(singleSong)
+// 搜索页码
+let searchPage = ref(0)
+// 搜索结果总数
+let songTotal = reactive({
+    value:0
+})
+// 展示搜索结果
+let showResult = ref(false)
+// 初始化
+onMounted(()=>{
+    // 初始化获取歌曲
+    getSearchSongs()
+    showResult.value = true
+})  
 
 // 搜索类型转义
 const tranalateType = (type) => {
@@ -69,15 +95,18 @@ const tranalateType = (type) => {
 }
 // 获取搜索关键词歌曲
 const getSearchSongs = async () => {
+    searchResult = reactive([])
     const { searchValue } = route.query
     testSearchText.value = searchValue
     const {data} = await search({
-        keywords:searchValue
+        keywords:searchValue,
+        limit:100,
+        offset:searchPage.value*100
     })
     data.result.songs.forEach(item=>{
         searchResult.push(item)
     })
-    console.log(searchResult);
+    songTotal.value = data.result.songCount
 }
 
 // 切换搜索类型
@@ -111,14 +140,31 @@ const changeSearchType = async (e) => {
     }
 }
 
-onMounted(()=>{
-    // 初始化获取歌曲
-    getSearchSongs()
-})  
+// 监听路由
+watch(route,()=>{router.go(0)})
+ 
+
+// 改变页码
+const changePage =async (e) => {
+    searchPage.value = e.value - 1
+    await getSearchSongs()    
+}
 
 </script>
 
 <style lang="less" scoped>
+.hidden{
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding-bottom: 75px;
+    box-sizing: border-box;
+}
+.container{
+    width: 103%;
+    height: 100%;
+    overflow-y: auto;
+}
 .search_container{
     display: flex;
     height: 100%;
@@ -154,7 +200,7 @@ onMounted(()=>{
         }
     }
     .search_result{
-        flex: 1;
+        min-width: 900px;
     }
 }
 </style>

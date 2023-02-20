@@ -66,7 +66,6 @@ onMounted(()=>{
     if(localStorage.getItem('userInfo')){
         userInfos.nickname = JSON.parse(localStorage.getItem('userInfo')).nickname
         userInfos.avatarUrl = JSON.parse(localStorage.getItem('userInfo')).avatarUrl
-        console.log(userInfos);
     }
 })
 

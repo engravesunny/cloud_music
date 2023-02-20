@@ -36,6 +36,11 @@
 </template>
 
 <script setup>
+import 'element-plus/theme-chalk/el-loading.css';
+
+import 'element-plus/theme-chalk/el-message-box.css';
+
+import 'element-plus/theme-chalk/el-message.css';
 import { qrKey, qrCreate, qrCheck } from '@/api/user.js'
 import { reactive } from '@vue/reactivity'
 import QRCode from 'qrcode'

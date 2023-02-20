@@ -130,6 +130,7 @@ let collectSonglist = reactive([
     padding-bottom: 75px;
     box-sizing: border-box;
     box-shadow: 0 0 1px 0 #000;
+    z-index: 1;
 }
 .container{
     width: 220px;
@@ -145,6 +146,7 @@ let collectSonglist = reactive([
     justify-content: flex-start;
     align-items: flex-start;
     width: 200px;
+    min-width: 200px;
     .side_top{
         padding-left: 5px;
         box-sizing: border-box;

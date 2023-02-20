@@ -49,15 +49,16 @@ import Footer from './components/Footer/index.vue'
     justify-content: space-between;
     height: 100vh;
     min-height:500px;
-    min-width: 900px;
     .main{
         flex: 1;
         display: flex;
         padding-top: 60px;
         box-sizing: border-box;
         height: 100%;
+        min-width: 600px;
         .main_container{
             flex: 1;
+            min-width: 600px;
         }
     }
 }
