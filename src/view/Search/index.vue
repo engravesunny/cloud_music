@@ -1,6 +1,6 @@
 <template>
-    <div class="hidden">
-        <div class="container">
+
+    <el-scrollbar>
             <div class="search_container unselectable">
                 <!-- 搜索关键词提示 -->
                 <div class="search_title unselectable">
@@ -31,8 +31,7 @@
                 <!-- 搜索结果 -->
 
             </div>
-        </div>
-    </div>
+        </el-scrollbar>
 </template>
 
 <script setup>

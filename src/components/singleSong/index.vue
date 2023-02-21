@@ -16,7 +16,7 @@
         <!-- 歌曲列表内容 -->
         <div class="songList">
             <ul>
-                <li v-for="(item,index) in result" :key="item.id">
+                <li v-for="(item,index) in result" :key="item.id" @dblclick="dblclickSong(item)">
                     <div class="option">
                         <div class="index">{{ (index+1)<10?'0'+(index+1):(index+1) }}</div>
                         <div class="iconfont">&#xe8ab;</div>
@@ -50,12 +50,26 @@
         </div>
         <!-- 列表分页导航 -->
 
-    </div>
+        </div>
+
 </template>
 
 <script setup>
 import '@/assets/icon/iconfont/iconfont.css'
 import { search } from '@/api/search'
+// 分割多歌手工具
+import mulArShows from '@/utils/mulArShow.js'
+// 引入底部播放栏状态信息
+import { song } from '@/store/song.js'
+import { storeToRefs } from 'pinia'
+
+const mulArShow = mulArShows
+
+const songStore = song()
+
+let { songInfo } = storeToRefs(songStore)
+
+
 const route = useRoute()
 const router = useRouter()
 
@@ -83,22 +97,27 @@ const formatTime= (a)=> {
 
 }
 
-// 多歌手分割符分割
-const mulArShow = (a) => {
-    let res = ''
-    a.map(item => {
-        res = res + item.name + '/'
-    })
-    return res.slice(0,res.length-1)
-}
-
 // 页码改变
 const currentChange = (page)=>{
-    console.log(page);
     currentPage.value = page
     emit('updatePage',currentPage)
 }
 
+// 双击播放
+const dblclickSong = (song) => {
+    songInfo.value.name = song.name
+    songInfo.value.picUrl = song.al.picUrl
+    songInfo.value.ar = song.ar
+    // 搜索歌曲直接插入播放列表
+    songInfo.value.songList.push(song)
+    // 切换当前播放歌曲
+    songInfo.value.currentPlayingSong = song
+
+    // 当前底部播放栏状态存入本地存储 使其持久化
+    localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
+    console.log(song);
+    console.log(songInfo);
+}
 </script>
 
 <style lang="less" scoped>

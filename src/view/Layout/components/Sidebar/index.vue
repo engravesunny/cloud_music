@@ -129,7 +129,8 @@ let collectSonglist = reactive([
     overflow: hidden;
     padding-bottom: 75px;
     box-sizing: border-box;
-    box-shadow: 0 0 1px 0 #000;
+    border-right: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgba(0,0,0,0.1);
     z-index: 1;
 }
 .container{

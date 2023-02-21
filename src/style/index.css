@@ -10,3 +10,8 @@ img{
 body{
     min-width: 1250px;
 }
+.shenglue{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
