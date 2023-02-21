@@ -1,39 +1,39 @@
 <template>
     <div class="main_body">
-        <!-- 顶部区域 -->
+            <!-- 顶部区域 -->
+                <!-- Navbar区域 -->
 
-            <!-- Navbar区域 -->
+                <Navbar></Navbar>
 
-            <Navbar></Navbar>
+                <!-- Navbar区域 -->
 
-            <!-- Navbar区域 -->
+            <!-- 顶部区域 -->
 
-        <!-- 顶部区域 -->
+            <!-- 主体区域 -->
 
-        <!-- 主体区域 -->
+                <div class="main">
+                            
+                    <!-- 左侧边栏 -->
+                    <Sidebar></Sidebar>
+                    <!-- 左侧边栏 -->
 
-            <div class="main">
-                         
-                <!-- 左侧边栏 -->
-                <Sidebar></Sidebar>
-                <!-- 左侧边栏 -->
+                    <!-- 二级路由/内容区域 -->
+                    <div class="main_container">
+                        <router-view></router-view>
+                    </div>                  
+                    <!-- 二级路由 -->
 
-                <!-- 二级路由/内容区域 -->
-                <div class="main_container">
-                    <router-view></router-view>
-                </div>                  
-                <!-- 二级路由 -->
+                </div>
 
-            </div>
+            <!-- 主体区域 -->
 
-        <!-- 主体区域 -->
+            <!-- 底部区域 -->
 
-        <!-- 底部区域 -->
+                <Footer></Footer>
 
-            <Footer></Footer>
-
-        <!-- 底部区域 -->
+            <!-- 底部区域 -->
     </div>
+
 </template>
 
 <script setup>

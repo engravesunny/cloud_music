@@ -12,7 +12,8 @@ export const song = defineStore('song',{
                 timeProgress:0,
                 playMode:0,
                 volume:50,
-                currentPlayingSong:{}
+                currentPlayingSong:{},
+                songUrl:''
             },
         }
     },

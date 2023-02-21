@@ -2,13 +2,13 @@
     <div class="footer unselectable">
 
             <!-- 歌曲封面 -->
-            <div class="songImg">
+            <div v-if="songState.picUrl" class="songImg">
                 <img :src="songState.picUrl" alt="">
             </div>
             <!-- 歌曲封面 -->
 
             <!-- 歌曲名称 -->
-            <div class="songInfo">
+            <div v-if="songState.name" class="songInfo">
                 <div class="songName shenglue">{{ songState.name }}</div>
                 <div class="songAr shenglue">{{ mulArShow(songState.ar) }}</div>
             </div>
@@ -26,24 +26,34 @@
             <!-- 上一曲、暂停、下一曲 -->
 
             <!-- 进度条、时间 -->
-            <div class="timeProgress">进度条、时间</div>
+            <div class="timeProgress">
+                <audio ref="aud" v-if="songState.songUrl" controls class="aud">
+                    <source ref="src" :src="songState.songUrl" />
+                </audio>
+            </div>
             <!-- 进度条、时间 -->
 
             <!-- 播放模式 -->
-            <div class="playMode">播放模式</div>
+            <div class="playMode">
+                <div v-if="songState.playMode===0" class="seqPlay iconfont" @click="changePlayMode">&#xea6f;</div>
+                <div v-if="songState.playMode===1" class="loopPlay iconfont" @click="changePlayMode">&#xe66c;</div>
+                <div v-if="songState.playMode===2" class="singlePlay iconfont" @click="changePlayMode">&#xe66d;</div>
+                <div v-if="songState.playMode===3" class="randomPlay iconfont" @click="changePlayMode">&#xe66b;</div>
+            </div>
             <!-- 播放模式 -->
 
             <!-- 音量 -->
-            <div class="volume">音量</div>
+            <div class="volume iconfont"><span class="icon">&#xe605;</span></div>
             <!-- 音量 -->
 
             <!-- 播放列表 -->
-            <div class="playList">播放列表</div>
+            <div class="playList iconfont" @click="playListShow"><span class="icon">&#xe62d;</span></div>
             <!-- 播放列表 -->
     </div>
 </template>
 
 <script setup>
+import { getSongUrl } from '@/api/search'
 // 引入图标
 import '@/assets/icon/iconfont/iconfont.css'
 // 引入多歌手分割工具
@@ -52,17 +62,57 @@ import mulArShow from '../../../../utils/mulArShow';
 import { song } from '@/store/song.js'
 import { storeToRefs } from 'pinia'
 const songStore = song()
+let { songInfo } = storeToRefs(songStore)
+
+const aud = ref(null)
+const src = ref(null)
+const getDom = getCurrentInstance()
+
+let songUrl = ref('1')
+
+
+// 播放状态 暂停/播放
 let isPlaying = ref(false)
-let songState = JSON.parse(localStorage.getItem('PLAYING_STATE'))
+
+// 播放状态暂存
+let songState = reactive({})
+songState = JSON.parse(localStorage.getItem('PLAYING_STATE'))
 // 初始化
 onBeforeMount(() => {
-    let { songInfo } = storeToRefs(songStore)
     if(songInfo.value.name){
         let songState = songInfo.value
     } else {
-        songInfo.value = JSON.parse(localStorage.getItem('PLAYING_STATE'))
+        if(localStorage.getItem('PLAYING_STATE')){
+            songInfo.value = JSON.parse(localStorage.getItem('PLAYING_STATE'))
+        }
         songState = songInfo.value
     }
+    
+})
+
+// 展示播放列表
+const playListShow = () => {
+    console.log(songState.songList);
+}
+// 改变播放模式
+const changePlayMode = () => {
+    songInfo.value.playMode++
+    if(songInfo.value.playMode===4){
+        songInfo.value.playMode = 0
+    }
+}
+
+watch(()=>songInfo,(newval)=>{
+    console.log('songInfo',newval);
+    console.log(getDom.refs);
+    if(getDom.refs.src){
+        getDom.refs.src.src = newval.value.songUrl
+        console.log(getDom.refs.src.src);
+        console.log(newval.value.songUrl);
+        document.querySelector('audio').play()
+    }
+},{
+    deep:true
 })
 </script>
 
@@ -75,14 +125,14 @@ onBeforeMount(() => {
     width: 100%;
     border-top: 1px solid rgba(0,0,0,0.1);
     background-color: #fff;
-    min-width: 1250px;
+    min-width: 900px;
     height: 75px;
     position: fixed;
     bottom: 0;
     left: 0;
     z-index: 999;
     .songImg{
-        width: 6%;
+        width: 90px;
         box-sizing: border-box;
         img{
             border-radius: 10px;
@@ -93,7 +143,7 @@ onBeforeMount(() => {
     .songInfo{
         display: flex;
         flex-direction: column;
-        width: 10%;
+        width: 100px;
         .songName{
             font-size: 16px;
         }
@@ -102,7 +152,7 @@ onBeforeMount(() => {
         }
     }
     .songOption{
-        width: 10%;
+        width: 180px;
         height: 75px;
         line-height: 75px;
         display: flex;
@@ -127,19 +177,41 @@ onBeforeMount(() => {
     }
     .timeProgress{
         flex: 1;
-        background-color: #f2bebe;
     }
     .playMode{
-        width: 5%;
-        background-color: #837d7d;
+        width: 40px;
+        box-sizing: border-box;
+        padding: 10px;
+        .iconfont{
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 700;
+            color: #000000;
+        }
     }
     .volume{
-        background-color: #8f75f9;
-        width: 5%;
+        width: 40px;
+        box-sizing: border-box;
+        padding: 10px;
+        .icon{
+            font-size: 22px;
+            cursor: pointer;
+            color: #000000;
+        }
     }
     .playList{
-        background-color: #e85050;
-        width: 5%;
+        width: 40px;
+        box-sizing: border-box;
+        padding: 10px;
+        .icon{
+            font-size: 27px;
+            cursor: pointer;
+            color: #000000;
+        }
+    }
+    
+    .icon:hover,.iconfont:hover{
+        color: #716f6f;
     }
 }   
 </style>

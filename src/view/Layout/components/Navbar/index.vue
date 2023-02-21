@@ -44,6 +44,7 @@ import User from './components/User.vue'
     height: 60px;
     background: #fff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1 );
+    z-index: 999;
     .logo{
         display: flex;
         float: left;

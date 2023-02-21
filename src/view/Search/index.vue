@@ -1,37 +1,36 @@
 <template>
-
     <el-scrollbar>
-            <div class="search_container unselectable">
-                <!-- 搜索关键词提示 -->
-                <div class="search_title unselectable">
-                    搜索 <span style="font-size:21px">{{ testSearchText }}</span>
-                </div>
-                <!-- 搜索关键词提示 -->
-
-                <!-- 搜索类型栏 -->
-                <div class="search_type_option">
-                    <ul class="type_list">
-                        <li :class="{active: searchType===1}" @click="e=>changeSearchType(e)">单曲</li>
-                        <li :class="{active: searchType===1000}" @click="e=>changeSearchType(e)">歌单</li>
-                        <li :class="{active: searchType===100}" @click="e=>changeSearchType(e)">歌手</li>
-                        <li :class="{active: searchType===10}" @click="e=>changeSearchType(e)">专辑</li>
-                        <li :class="{active: searchType===1014}" @click="e=>changeSearchType(e)">视频</li>
-                        <li :class="{active: searchType===1009}" @click="e=>changeSearchType(e)">播客</li>
-                        <li :class="{active: searchType===1002}" @click="e=>changeSearchType(e)">用户</li>
-                    </ul>
-                </div>
-                <!-- 搜索类型栏 -->
-
-                <!-- 搜索结果 -->
-                <div class="search_result">
-                    <keep-alive>
-                        <component v-loading="!searchResult.length" :is="searchTypeComponent" :currentPages="searchPage" :result="searchResult" :songTotal="songTotal" @updatePage="changePage"></component>
-                    </keep-alive>
-                </div>
-                <!-- 搜索结果 -->
-
+        <div class="search_container unselectable">
+            <!-- 搜索关键词提示 -->
+            <div class="search_title unselectable">
+                搜索 <span style="font-size:21px">{{ testSearchText }}</span>
             </div>
-        </el-scrollbar>
+            <!-- 搜索关键词提示 -->
+
+            <!-- 搜索类型栏 -->
+            <div class="search_type_option">
+                <ul class="type_list">
+                    <li :class="{active: searchType===1}" @click="e=>changeSearchType(e)">单曲</li>
+                    <li :class="{active: searchType===1000}" @click="e=>changeSearchType(e)">歌单</li>
+                    <li :class="{active: searchType===100}" @click="e=>changeSearchType(e)">歌手</li>
+                    <li :class="{active: searchType===10}" @click="e=>changeSearchType(e)">专辑</li>
+                    <li :class="{active: searchType===1014}" @click="e=>changeSearchType(e)">视频</li>
+                    <li :class="{active: searchType===1009}" @click="e=>changeSearchType(e)">播客</li>
+                    <li :class="{active: searchType===1002}" @click="e=>changeSearchType(e)">用户</li>
+                </ul>
+            </div>
+            <!-- 搜索类型栏 -->
+
+            <!-- 搜索结果 -->
+            <div class="search_result">
+                <keep-alive>
+                    <component v-loading="!searchResult.length" :is="searchTypeComponent" :currentPages="searchPage" :result="searchResult" :songTotal="songTotal" @updatePage="changePage"></component>
+                </keep-alive>
+            </div>
+            <!-- 搜索结果 -->
+
+        </div>
+    </el-scrollbar>
 </template>
 
 <script setup>
@@ -140,7 +139,7 @@ const changeSearchType = async (e) => {
 }
 
 // 监听路由
-watch(route,()=>{router.go(0)})
+watch(route,()=>{getSearchSongs()})
  
 
 // 改变页码
@@ -152,23 +151,12 @@ const changePage =async (e) => {
 </script>
 
 <style lang="less" scoped>
-.hidden{
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    padding-bottom: 75px;
-    box-sizing: border-box;
-}
-.container{
-    width: 103%;
-    height: 100%;
-    overflow-y: auto;
-}
 .search_container{
     display: flex;
     height: 100%;
     flex-direction: column;
     justify-content: flex-start;
+    padding-bottom: 75px;
     .search_title{
         height: 80px;
         box-sizing: border-box;

@@ -1,8 +1,7 @@
 <template>
     <div class="home_container unselectable">
         <span>首页</span>
-        {{ getUserInfo.nickname }}
-        <el-button @click="changeNum">改变</el-button>
+        
     </div>
 </template>
 

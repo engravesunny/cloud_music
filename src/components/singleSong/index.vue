@@ -2,7 +2,7 @@
     <div class="singleSongContainer">
 
         <!-- 歌曲列表 -->
-
+        
         <!-- 表头标题 -->
         <div class="singleSongTitle">
             <div class="option">操作</div>
@@ -31,7 +31,9 @@
                     </div>
                     <div class="ablumName">{{ item.al.name }}</div>
                     <div class="timeLength">{{ formatTime(item.dt) }}</div>
-                    <div class="hotLength">{{ item.pop }}</div>
+                    <div class="hotLength">
+                        <el-progress :percentage="item.pop" :show-text="false" color="#a8a8a8" style="width:80%" />
+                    </div>
                 </li>
             </ul>
         </div>
@@ -56,12 +58,14 @@
 
 <script setup>
 import '@/assets/icon/iconfont/iconfont.css'
-import { search } from '@/api/search'
+import { search, getSongUrl } from '@/api/search'
+
 // 分割多歌手工具
 import mulArShows from '@/utils/mulArShow.js'
 // 引入底部播放栏状态信息
 import { song } from '@/store/song.js'
 import { storeToRefs } from 'pinia'
+import { get } from 'lodash'
 
 const mulArShow = mulArShows
 
@@ -104,15 +108,23 @@ const currentChange = (page)=>{
 }
 
 // 双击播放
-const dblclickSong = (song) => {
+const dblclickSong = async(song) => {
     songInfo.value.name = song.name
     songInfo.value.picUrl = song.al.picUrl
     songInfo.value.ar = song.ar
     // 搜索歌曲直接插入播放列表
-    songInfo.value.songList.push(song)
+    if(songInfo.value.songList.length){
+        songInfo.value.songList = songInfo.value.songList.filter(item=>item.id!==song.id)
+        songInfo.value.songList.push(song)
+    } else {
+        songInfo.value.songList.push(song)
+    }
     // 切换当前播放歌曲
     songInfo.value.currentPlayingSong = song
-
+    const { data } = await getSongUrl({
+        id:song.id
+    })
+    songInfo.value.songUrl = data.data[0].url
     // 当前底部播放栏状态存入本地存储 使其持久化
     localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
     console.log(song);
@@ -132,7 +144,7 @@ const dblclickSong = (song) => {
         color: #888888;
         .option{
             box-sizing: border-box;
-            padding-left: 80px;
+            padding-left: 70px;
             width: 10.2%;
         }
         .songName{
@@ -165,7 +177,7 @@ const dblclickSong = (song) => {
             box-sizing: border-box;
             .option{
                 box-sizing: border-box;
-                padding-left: 80px;
+                padding-left: 70px;
                 width: 10.2%;
                 display: flex;
                 justify-content: flex-start;
@@ -211,6 +223,7 @@ const dblclickSong = (song) => {
             }
             .hotLength{
                 width: 10%;
+                display: flex;
             }
         }
         li:nth-child(2n){
