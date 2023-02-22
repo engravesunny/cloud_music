@@ -36,9 +36,12 @@
 </template>
 
 <script setup>
+//  引入element消息提示及loading状态
 import 'element-plus/theme-chalk/el-loading.css';
 import 'element-plus/theme-chalk/el-message-box.css';
 import 'element-plus/theme-chalk/el-message.css';
+
+//  二维码转图片库
 import { qrKey, qrCreate, qrCheck } from '@/api/user.js'
 import { reactive } from '@vue/reactivity'
 import QRCode from 'qrcode'

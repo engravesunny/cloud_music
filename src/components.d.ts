@@ -18,6 +18,7 @@ declare module '@vue/runtime-core' {
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElProgress: typeof import('element-plus/es')['ElProgress']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    ElSlider: typeof import('element-plus/es')['ElSlider']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumen: typeof import('element-plus/es')['ElTableColumen']
     RouterLink: typeof import('vue-router')['RouterLink']

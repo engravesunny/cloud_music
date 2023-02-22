@@ -9,7 +9,7 @@ export const song = defineStore('song',{
                 name:'',
                 ar:[],
                 songList:[],
-                timeProgress:0,
+                playDuration:0,
                 playMode:0,
                 volume:50,
                 currentPlayingSong:{},

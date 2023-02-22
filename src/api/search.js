@@ -35,3 +35,11 @@ export const getSongUrl = params => request({
     url:"/song/url",
     params
 })
+
+
+// 音乐是否可用
+
+export const checkSong = params => request({
+    url:"/check/music",
+    params
+})

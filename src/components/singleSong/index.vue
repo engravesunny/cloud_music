@@ -57,8 +57,17 @@
 </template>
 
 <script setup>
+
+//  引入element消息提示及loading状态
+import 'element-plus/theme-chalk/el-loading.css';
+import 'element-plus/theme-chalk/el-message-box.css';
+import 'element-plus/theme-chalk/el-message.css';
+
 import '@/assets/icon/iconfont/iconfont.css'
-import { search, getSongUrl } from '@/api/search'
+import { search, getSongUrl, checkSong } from '@/api/search'
+
+import formatTime from '@/utils/formatTime.js'
+
 
 // 分割多歌手工具
 import mulArShows from '@/utils/mulArShow.js'
@@ -84,22 +93,7 @@ const emit = defineEmits(['updatePage'])
 
 let results = computed(()=>{ return result })
 
-// 毫秒转 分:秒
-const formatTime= (a)=> {
-        let m = 0
-        let s = 0
-        m = Math.floor(a/60000)
-        s = Math.floor((a%60000)/1000)
-        const tos = (a) => {
-            if(a<10){
-                return '0'+a
-            } else {
-                return a.toString()
-            }
-        }
-        return tos(m) + ':' + tos(s)
 
-}
 
 // 页码改变
 const currentChange = (page)=>{
@@ -109,10 +103,18 @@ const currentChange = (page)=>{
 
 // 双击播放
 const dblclickSong = async(song) => {
+    const isAvailable = await checkSong({
+        id:song.id
+    })
+    if(!isAvailable.data.success){
+        return ElMessage('暂无版权')
+    }
+    // 信息赋值到状态
     songInfo.value.name = song.name
     songInfo.value.picUrl = song.al.picUrl
     songInfo.value.ar = song.ar
-    // 搜索歌曲直接插入播放列表
+    songInfo.value.playDuration = song.dt
+    // 搜索歌曲插入播放列表,id相同歌曲删除
     if(songInfo.value.songList.length){
         songInfo.value.songList = songInfo.value.songList.filter(item=>item.id!==song.id)
         songInfo.value.songList.push(song)
@@ -121,14 +123,14 @@ const dblclickSong = async(song) => {
     }
     // 切换当前播放歌曲
     songInfo.value.currentPlayingSong = song
+
+    // 获取歌曲url
     const { data } = await getSongUrl({
         id:song.id
     })
     songInfo.value.songUrl = data.data[0].url
     // 当前底部播放栏状态存入本地存储 使其持久化
     localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
-    console.log(song);
-    console.log(songInfo);
 }
 </script>
 

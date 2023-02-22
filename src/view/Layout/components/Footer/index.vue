@@ -17,7 +17,7 @@
             <!-- 上一曲、暂停、下一曲 -->
             <div class="songOption">
                 <div class="beforeSong iconfont"><p>&#xe63c;</p></div>
-                <div class="pause iconfont" @click="isPlaying = !isPlaying">
+                <div class="pause iconfont" @click="changePlayingState">
                     <span v-if="isPlaying">&#xe87a;</span>
                     <span v-else>&#xe87c;</span>
                 </div>
@@ -27,18 +27,20 @@
 
             <!-- 进度条、时间 -->
             <div class="timeProgress">
-                <audio ref="aud" v-if="songState.songUrl" controls class="aud">
-                    <source ref="src" :src="songState.songUrl" />
-                </audio>
+                <div class="played">{{ playedTime }}</div>
+                <div class="progress">
+                    <el-slider v-model="playedProgress" :show-tooltip="false" @change="changePlayedTimeLast" @input="changePlayedTime" />
+                </div>
+                <div class="duration">{{ formatTime(songState.playDuration) }}</div>
             </div>
             <!-- 进度条、时间 -->
 
             <!-- 播放模式 -->
-            <div class="playMode">
-                <div v-if="songState.playMode===0" class="seqPlay iconfont" @click="changePlayMode">&#xea6f;</div>
-                <div v-if="songState.playMode===1" class="loopPlay iconfont" @click="changePlayMode">&#xe66c;</div>
-                <div v-if="songState.playMode===2" class="singlePlay iconfont" @click="changePlayMode">&#xe66d;</div>
-                <div v-if="songState.playMode===3" class="randomPlay iconfont" @click="changePlayMode">&#xe66b;</div>
+            <div class="playMode" @click="changePlayMode">
+                <div v-if="songState.playMode===0" class="seqPlay iconfont">&#xea6f;</div>
+                <div v-if="songState.playMode===1" class="loopPlay iconfont">&#xe66c;</div>
+                <div v-if="songState.playMode===2" class="singlePlay iconfont">&#xe66d;</div>
+                <div v-if="songState.playMode===3" class="randomPlay iconfont">&#xe66b;</div>
             </div>
             <!-- 播放模式 -->
 
@@ -53,6 +55,13 @@
 </template>
 
 <script setup>
+
+// 引入时间转换工具
+import formatTime from '../../../../utils/formatTime';
+// 播放url工具
+import createAudio from '../../../../utils/createAudio';
+
+// 引入api
 import { getSongUrl } from '@/api/search'
 // 引入图标
 import '@/assets/icon/iconfont/iconfont.css'
@@ -64,19 +73,28 @@ import { storeToRefs } from 'pinia'
 const songStore = song()
 let { songInfo } = storeToRefs(songStore)
 
-const aud = ref(null)
-const src = ref(null)
-const getDom = getCurrentInstance()
-
-let songUrl = ref('1')
-
-
 // 播放状态 暂停/播放
 let isPlaying = ref(false)
 
+// 暂停/播放函数
+const changePlayingState = () => {
+    isPlaying.value = !isPlaying.value
+    let audio = document.querySelector('audio')
+    if(audio.paused){
+        audio.play()
+    } else {
+        audio.pause()
+    }
+}
+
 // 播放状态暂存
 let songState = reactive({})
-songState = JSON.parse(localStorage.getItem('PLAYING_STATE'))
+if(songInfo.value.name){
+    songState = reactive(JSON.parse(localStorage.getItem('PLAYING_STATE')))
+} else {
+    songState = songInfo.value
+}
+
 // 初始化
 onBeforeMount(() => {
     if(songInfo.value.name){
@@ -90,10 +108,29 @@ onBeforeMount(() => {
     
 })
 
+// 已播放时长
+let playedTime = ref('00:00')
+// 已播放进度条
+let playedProgress = ref(0)
+
+// 拉进度条
+const changePlayedTime = (val) => {
+    let audio = document.querySelector('audio')
+    audio.removeEventListener('timeupdate',changeTimeFn)
+    playedTime.value = formatTime(audio.duration*val*10)
+}
+// 松开进度条
+const changePlayedTimeLast = (val) => {
+    let audio = document.querySelector('audio')
+    audio.currentTime = (audio.duration*val)/100
+    audio.addEventListener('timeupdate',changeTimeFn)
+}
+
 // 展示播放列表
 const playListShow = () => {
     console.log(songState.songList);
 }
+
 // 改变播放模式
 const changePlayMode = () => {
     songInfo.value.playMode++
@@ -102,17 +139,32 @@ const changePlayMode = () => {
     }
 }
 
-watch(()=>songInfo,(newval)=>{
+// 监听调用函数
+const changeTimeFn = ()=> {
+    const audio = document.querySelector('audio')
+    playedTime.value = formatTime(audio.currentTime*1000)
+    playedProgress.value = (audio.currentTime/audio.duration)*100
+}
+
+// 监听当前播放歌曲url
+watch(()=>songInfo.value.songUrl,(newval)=>{
     console.log('songInfo',newval);
-    console.log(getDom.refs);
-    if(getDom.refs.src){
-        getDom.refs.src.src = newval.value.songUrl
-        console.log(getDom.refs.src.src);
-        console.log(newval.value.songUrl);
-        document.querySelector('audio').play()
-    }
+    createAudio(newval,songState.playMode === 2)
+    const audio = document.querySelector('audio')
+    audio.addEventListener('canplay',()=>{
+        console.log(audio.duration);
+
+    })
+    audio.addEventListener('play',()=>{
+        isPlaying.value = true
+    })
+    audio.addEventListener('pause',()=>{
+        isPlaying.value = false
+    })
+    audio.addEventListener('timeupdate',changeTimeFn)
 },{
-    deep:true
+    deep:true,
+    immediate:false
 })
 </script>
 
@@ -177,6 +229,21 @@ watch(()=>songInfo,(newval)=>{
     }
     .timeProgress{
         flex: 1;
+        display: flex;
+        justify-content:flex-start;
+        align-items: center;
+        box-sizing: border-box;
+        padding: 0 40px;
+        .played{
+            width: 50px;
+        }
+        .progress{
+            padding: 0 10px;
+            flex: 1;
+        }
+        .duration{
+            width: 50px;
+        }
     }
     .playMode{
         width: 40px;
