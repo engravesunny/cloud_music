@@ -2,7 +2,7 @@
     <div class="singleSongContainer">
 
         <!-- 歌曲列表 -->
-
+        
         <!-- 表头标题 -->
         <div class="singleSongTitle">
             <div class="option">操作</div>
@@ -16,7 +16,7 @@
         <!-- 歌曲列表内容 -->
         <div class="songList">
             <ul>
-                <li v-for="(item,index) in result" :key="item.id">
+                <li v-for="(item,index) in result" :key="item.id" @dblclick="dblclickSong(item)">
                     <div class="option">
                         <div class="index">{{ (index+1)<10?'0'+(index+1):(index+1) }}</div>
                         <div class="iconfont">&#xe8ab;</div>
@@ -31,7 +31,9 @@
                     </div>
                     <div class="ablumName">{{ item.al.name }}</div>
                     <div class="timeLength">{{ formatTime(item.dt) }}</div>
-                    <div class="hotLength">{{ item.pop }}</div>
+                    <div class="hotLength">
+                        <el-progress :percentage="item.pop" :show-text="false" color="#a8a8a8" style="width:80%" />
+                    </div>
                 </li>
             </ul>
         </div>
@@ -50,12 +52,37 @@
         </div>
         <!-- 列表分页导航 -->
 
-    </div>
+        </div>
+
 </template>
 
 <script setup>
+
+//  引入element消息提示及loading状态
+import 'element-plus/theme-chalk/el-loading.css';
+import 'element-plus/theme-chalk/el-message-box.css';
+import 'element-plus/theme-chalk/el-message.css';
+
 import '@/assets/icon/iconfont/iconfont.css'
-import { search } from '@/api/search'
+import { search, getSongUrl, checkSong } from '@/api/search'
+
+import formatTime from '@/utils/formatTime.js'
+
+
+// 分割多歌手工具
+import mulArShows from '@/utils/mulArShow.js'
+// 引入底部播放栏状态信息
+import { song } from '@/store/song.js'
+import { storeToRefs } from 'pinia'
+import { get } from 'lodash'
+
+const mulArShow = mulArShows
+
+const songStore = song()
+
+let { songInfo } = storeToRefs(songStore)
+
+
 const route = useRoute()
 const router = useRouter()
 
@@ -66,39 +93,45 @@ const emit = defineEmits(['updatePage'])
 
 let results = computed(()=>{ return result })
 
-// 毫秒转 分:秒
-const formatTime= (a)=> {
-        let m = 0
-        let s = 0
-        m = Math.floor(a/60000)
-        s = Math.floor((a%60000)/1000)
-        const tos = (a) => {
-            if(a<10){
-                return '0'+a
-            } else {
-                return a.toString()
-            }
-        }
-        return tos(m) + ':' + tos(s)
 
-}
-
-// 多歌手分割符分割
-const mulArShow = (a) => {
-    let res = ''
-    a.map(item => {
-        res = res + item.name + '/'
-    })
-    return res.slice(0,res.length-1)
-}
 
 // 页码改变
 const currentChange = (page)=>{
-    console.log(page);
     currentPage.value = page
     emit('updatePage',currentPage)
 }
 
+// 双击播放
+const dblclickSong = async(song) => {
+    const isAvailable = await checkSong({
+        id:song.id
+    })
+    if(!isAvailable.data.success){
+        return ElMessage('暂无版权')
+    }
+    // 信息赋值到状态
+    songInfo.value.name = song.name
+    songInfo.value.picUrl = song.al.picUrl
+    songInfo.value.ar = song.ar
+    songInfo.value.playDuration = song.dt
+    // 搜索歌曲插入播放列表,id相同歌曲删除
+    if(songInfo.value.songList.length){
+        songInfo.value.songList = songInfo.value.songList.filter(item=>item.id!==song.id)
+        songInfo.value.songList.push(song)
+    } else {
+        songInfo.value.songList.push(song)
+    }
+    // 切换当前播放歌曲
+    songInfo.value.currentPlayingSong = song
+
+    // 获取歌曲url
+    const { data } = await getSongUrl({
+        id:song.id
+    })
+    songInfo.value.songUrl = data.data[0].url
+    // 当前底部播放栏状态存入本地存储 使其持久化
+    localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
+}
 </script>
 
 <style lang="less" scoped>
@@ -113,7 +146,7 @@ const currentChange = (page)=>{
         color: #888888;
         .option{
             box-sizing: border-box;
-            padding-left: 80px;
+            padding-left: 70px;
             width: 10.2%;
         }
         .songName{
@@ -146,7 +179,7 @@ const currentChange = (page)=>{
             box-sizing: border-box;
             .option{
                 box-sizing: border-box;
-                padding-left: 80px;
+                padding-left: 70px;
                 width: 10.2%;
                 display: flex;
                 justify-content: flex-start;
@@ -192,6 +225,7 @@ const currentChange = (page)=>{
             }
             .hotLength{
                 width: 10%;
+                display: flex;
             }
         }
         li:nth-child(2n){

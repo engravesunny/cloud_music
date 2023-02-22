@@ -43,7 +43,8 @@ import User from './components/User.vue'
     min-width: 900px;
     height: 60px;
     background: #fff;
-    box-shadow: 0px 0px 1px 0px #000;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1 );
+    z-index: 999;
     .logo{
         display: flex;
         float: left;
