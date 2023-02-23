@@ -16,12 +16,12 @@
 
             <!-- 上一曲、暂停、下一曲 -->
             <div class="songOption">
-                <div class="beforeSong iconfont"><p>&#xe63c;</p></div>
+                <div class="beforeSong iconfont" @click="nextSong(false)"><p>&#xe63c;</p></div>
                 <div class="pause iconfont" @click="changePlayingState">
                     <span v-if="isPlaying">&#xe87a;</span>
                     <span v-else>&#xe87c;</span>
                 </div>
-                <div class="nextSong iconfont"><p>&#xe63e;</p></div>
+                <div class="nextSong iconfont" @click="nextSong(true)"><p>&#xe63e;</p></div>
             </div>
             <!-- 上一曲、暂停、下一曲 -->
 
@@ -45,21 +45,28 @@
             <!-- 播放模式 -->
 
             <!-- 音量 -->
+            <volum class="volumeOption" v-if="isChangingVolume"></volum>
             <div class="volume iconfont"><span class="icon">&#xe605;</span></div>
             <!-- 音量 -->
 
             <!-- 播放列表 -->
+            <songList v-if="showSongList"></songList>
             <div class="playList iconfont" @click="playListShow"><span class="icon">&#xe62d;</span></div>
             <!-- 播放列表 -->
     </div>
 </template>
 
 <script setup>
-
+// 歌曲列表组件
+import songList from './components/songList.vue'
+// 音量组件
+import volum from './components/volum.vue';
 // 引入时间转换工具
 import formatTime from '../../../../utils/formatTime';
 // 播放url工具
 import createAudio from '../../../../utils/createAudio';
+// 上一首、下一首函数
+import nextSong from '../../../../utils/nextSong'
 
 // 引入api
 import { getSongUrl } from '@/api/search'
@@ -105,7 +112,9 @@ onBeforeMount(() => {
         }
         songState = songInfo.value
     }
-    
+})
+onMounted(()=>{
+    changeVolume()
 })
 
 // 已播放时长
@@ -126,9 +135,31 @@ const changePlayedTimeLast = (val) => {
     audio.addEventListener('timeupdate',changeTimeFn)
 }
 
+// 音量控制
+let isChangingVolume = ref(false)
+let changeVolume = () => {
+    let volume = document.querySelector('.volume')
+    volume.addEventListener('mouseover',(e)=>{
+        isChangingVolume.value = true
+        let x = e.clientX
+        let y = e.clientY
+        let Lx = 0
+        let Ly = 0
+        document.onmousemove = (e_e)=>{
+            Lx = Math.abs(e_e.clientX-x)
+            Ly = Math.abs(e_e.clientY-y)
+            if(Lx>40||Ly>200){
+                isChangingVolume.value = false
+                document.onmousemove = null
+            }
+        }
+    })
+}
+
 // 展示播放列表
+let showSongList = ref(false)
 const playListShow = () => {
-    console.log(songState.songList);
+    showSongList.value = !showSongList.value
 }
 
 // 改变播放模式
@@ -148,6 +179,7 @@ const changeTimeFn = ()=> {
 
 // 监听当前播放歌曲url
 watch(()=>songInfo.value.songUrl,(newval)=>{
+    songState = songInfo.value
     console.log('songInfo',newval);
     createAudio(newval,songState.playMode === 2)
     const audio = document.querySelector('audio')

@@ -18,7 +18,8 @@
             <ul>
                 <li v-for="(item,index) in result" :key="item.id" @dblclick="dblclickSong(item)">
                     <div class="option">
-                        <div class="index">{{ (index+1)<10?'0'+(index+1):(index+1) }}</div>
+                        <div  v-if="item.id===songState.currentPlayingSong.id" class="playingIcon iconfont">&#xe62e;</div>
+                        <div v-else class="index">{{ (index+1)<10?'0'+(index+1):(index+1) }}</div>
                         <div class="iconfont">&#xe8ab;</div>
                     </div>
                     <div class="songName">
@@ -71,23 +72,47 @@ import formatTime from '@/utils/formatTime.js'
 
 // 分割多歌手工具
 import mulArShows from '@/utils/mulArShow.js'
+
+
+// 引入歌曲播放函数
+import dblclickSong from '@/utils/playSong.js'
+
+
 // 引入底部播放栏状态信息
 import { song } from '@/store/song.js'
 import { storeToRefs } from 'pinia'
-import { get } from 'lodash'
-
-const mulArShow = mulArShows
 
 const songStore = song()
 
 let { songInfo } = storeToRefs(songStore)
 
+const mulArShow = mulArShows
+
+let songState = reactive({})
+
+watch(()=>songInfo.value,(val)=>{
+    songState= songInfo.value
+},{
+    deep:true,
+    immediate:true
+})
+
+if(songInfo.value.currentPlayingSong){
+    songState = songInfo.value
+} else {
+    if(localStorage.getItem('PLAYING_STATE')){
+            songInfo.value = JSON.parse(localStorage.getItem('PLAYING_STATE'))
+    }
+    songState = songInfo.value
+}
 
 const route = useRoute()
 const router = useRouter()
 
 // 当前页码
 const currentPage = ref(0)
+
+// 接收父组件数据
 let props = defineProps(['result','songTotal','currentPages'])
 const emit = defineEmits(['updatePage'])
 
@@ -97,41 +122,12 @@ let results = computed(()=>{ return result })
 
 // 页码改变
 const currentChange = (page)=>{
+    console.log(page);
     currentPage.value = page
     emit('updatePage',currentPage)
 }
 
-// 双击播放
-const dblclickSong = async(song) => {
-    const isAvailable = await checkSong({
-        id:song.id
-    })
-    if(!isAvailable.data.success){
-        return ElMessage('暂无版权')
-    }
-    // 信息赋值到状态
-    songInfo.value.name = song.name
-    songInfo.value.picUrl = song.al.picUrl
-    songInfo.value.ar = song.ar
-    songInfo.value.playDuration = song.dt
-    // 搜索歌曲插入播放列表,id相同歌曲删除
-    if(songInfo.value.songList.length){
-        songInfo.value.songList = songInfo.value.songList.filter(item=>item.id!==song.id)
-        songInfo.value.songList.push(song)
-    } else {
-        songInfo.value.songList.push(song)
-    }
-    // 切换当前播放歌曲
-    songInfo.value.currentPlayingSong = song
 
-    // 获取歌曲url
-    const { data } = await getSongUrl({
-        id:song.id
-    })
-    songInfo.value.songUrl = data.data[0].url
-    // 当前底部播放栏状态存入本地存储 使其持久化
-    localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
-}
 </script>
 
 <style lang="less" scoped>
@@ -183,6 +179,9 @@ const dblclickSong = async(song) => {
                 width: 10.2%;
                 display: flex;
                 justify-content: flex-start;
+                .playingIcon{
+                    margin-left: -40px !important;
+                }
                 .index{
                     margin-left: -40px;
                 }
