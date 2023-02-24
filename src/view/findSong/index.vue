@@ -5,24 +5,32 @@
 
             <!-- 推荐歌单 -->
             <div class="suggest_playlist">
-                <suggestList :highPlayList="highPlayList"></suggestList>
+                <suggestList :suggestLists="suggestLists" :title="suggestListsTitle"></suggestList>
             </div>
             <!-- 推荐歌单 -->
 
+            <!-- 精品歌单 -->
+            <div class="suggest_playlist">
+                <highList :suggestLists="highPlayList" :title="highPlayListTitle"></highList>
+            </div>
+            <!-- 精品歌单 -->
         </div>
     </el-scrollbar>
     
 </template>
 
 <script setup>
+import highList from './components/highList.vue'
 import suggestList from './components/suggestList.vue'
 import swiper from './components/swiper.vue';
-import { getHotBanner, getHighPlayList } from '@/api/songList'
+import { getHotBanner, getHighPlayList, getDailyList } from '@/api/songList'
 
 let bannerList = reactive([])
 
 let highPlayList = reactive([])
-
+let highPlayListTitle = '精品歌单'
+let suggestLists = reactive([])
+let suggestListsTitle = '推荐歌单'
 onMounted(async()=>{
     const { data } = await getHotBanner({
         type:0
@@ -30,19 +38,27 @@ onMounted(async()=>{
     data.banners.forEach(item => {
         bannerList.push(item)
     });
-    const res = await getHighPlayList({
-        limit:50
+    const res1 = await getHighPlayList({
+        limit:50,
+        cat:'ACG'
     })
-    res.data.playlists.forEach((item,index)=>{
+    console.log(res1);
+    res1.data.playlists.forEach((item,index)=>{
         highPlayList.push(item)
     })
-    console.log(highPlayList);
+    const res2 = await getDailyList({
+        limit:14
+    })
+    res2.data.result.forEach((item,index)=>{
+        suggestLists.push(item)
+    })
 })
 
 </script>
 
 <style lang="less" scoped>
 .findSongContainer{
+    padding-bottom: 75px;
     .suggest_playlist{
         padding: 20px;
     }

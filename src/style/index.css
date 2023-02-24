@@ -15,6 +15,12 @@ body{
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+.shenglue2{
+    overflow: hidden;
+    white-space: nowrap;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+}
 .el-slider__button.el-tooltip__trigger.el-tooltip__trigger{
     width: 10px;
     height: 10px;

@@ -5,9 +5,8 @@
         </h2>
         <div class="playlist_container">
             <ul>
-                <li class="suggestList">每日推荐</li>
                 <li v-for="item in suggestLists" :key="item.id">
-                    <img :src="item.picUrl" alt="">
+                    <img :src="item.coverImgUrl" alt="">
                     <div class="name">{{item.name}}</div>
                 </li>
             </ul>
