@@ -48,6 +48,7 @@ const inputVolum = (val) => {
     justify-content: center;
     border-radius: 10px;
     background: rgba(108, 105, 105, 0.3);
+    z-index: 999;
 }
     
 </style>

@@ -58,17 +58,13 @@ let searchPage = ref(0)
 
 // 接口有问题，搜索结果总数只接受第一次返回数据
 // 搜索结果总数
-let songTotal = reactive({
-    value:100
-})
+let songTotal = ref(100)
 
 // 搜索结果总数 桥梁
 
 let songTotalProp = reactive({
     value:100
 })
-
-
 
 // 剩余歌曲数目
 let restSongCount = ref(100)
@@ -79,7 +75,6 @@ onBeforeMount(async()=>{
     // 初始化获取歌曲
     await getSearchSongs()
     songTotal.value = songTotalProp.value
-    console.log(songTotal.value);
     showResult.value = true
 })  
 
@@ -121,7 +116,6 @@ const getSearchSongs = async () => {
         searchResult.push(item)
     })
     songTotalProp.value = data.result.songCount
-    console.log(res);
 }
 
 // 切换搜索类型
@@ -156,11 +150,15 @@ const changeSearchType = async (e) => {
 }
 
 // 监听路由
-watch(route,()=>{
-    // 获取歌曲
-    getSearchSongs()
+watch(route,async()=>{
     // 页数置零
     searchPage.value = 0
+    // 获取歌曲
+    await getSearchSongs()
+    // 歌曲总数更新
+    console.log('更新');
+    songTotal.value = songTotalProp.value
+    console.log(songTotal);
 })
  
 
@@ -168,7 +166,6 @@ watch(route,()=>{
 const changePage =async (e) => {
     searchPage.value = e.value - 1
     restSongCount.value =songTotal.value - (e.value - 1)*100
-    console.log(restSongCount.value);
     await getSearchSongs() 
 }
 
@@ -202,6 +199,7 @@ const changePage =async (e) => {
                 height: 100%;
                 padding: 13px;
                 transition: all 0.1s;
+                cursor: pointer;
             }
             .active{
                 font-size: 17px;

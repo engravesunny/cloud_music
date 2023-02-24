@@ -20,7 +20,7 @@
         <div v-if="showSuggest" @click="showSuggest = false" style="width:100vw;height:100vh;position:fixed;top:0;left:0;">
             <div v-if="showSuggest" class="suggest">
                 <div class="suggest_title">猜你想搜</div>
-                    <ul v-if="suggestList.length&&showSuggest">
+                    <ul v-if="suggestList.length&&showSuggest&&searchText">
                         <li class="suggest_cell" v-for="item in suggestList" :key="item.id" @click="suggestSearch(item.name)">
                             {{ item.name }}{{  item.artists.length? ' - ':'' }}
                             <span v-for="artist in item.artists" :key="artist.id">{{ artist.name+' ' }}</span>
@@ -87,6 +87,7 @@ const fnSearch = () => {
 // 搜索建议列表
 let suggestList = reactive([])
 
+let timer = null
 
 // 搜索建议input事件
 let searchSuggestFn = async() => {
@@ -99,14 +100,18 @@ let searchSuggestFn = async() => {
     suggestList.length = 0
 
     if(!searchText.value)return;
-    const {data} = await searchSuggest({
-        keywords:searchText.value
-    })
-    if(data.result){
+    timer = setTimeout(async() => {
+        const {data} = await searchSuggest({
+            keywords:searchText.value
+        })
+        if(data.result){
         data.result.songs.forEach(item=>{
             suggestList.push(item)
         })
+        clearTimeout(timer)
+        timer = null
     }
+    }, 200);
 }
 
 // 点击搜索建议搜索

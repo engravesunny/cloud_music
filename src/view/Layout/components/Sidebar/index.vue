@@ -39,11 +39,18 @@
 
 <script setup>
 
+const router = useRouter()
+
 // 左侧栏上部分按钮
 let sideCellList = reactive([
     {
+        name:'发现音乐',
+        active:true, //默认展示发现音乐
+        path:'/findSong' 
+    },
+    {
         name:'我的收藏',
-        active:true, //默认展示我的收藏
+        active:false, 
         path:'/myLike'
     },
     {
@@ -55,11 +62,6 @@ let sideCellList = reactive([
         name:'私人FM',
         active:false,
         path:'/privateFM' 
-    },
-    {
-        name:'播放历史',
-        active:false,
-        path:'/playHistory' 
     }
 ])
 
@@ -69,6 +71,7 @@ const toCell = (item) => {
         item.active = false
     });
     item.active = true
+    router.push(item.path)
 }
 
 // 左侧栏下部分

@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "586863",
+      "name": "dot",
+      "font_class": "dot",
+      "unicode": "e711",
+      "unicode_decimal": 59153
+    },
+    {
+      "icon_id": "577402",
+      "name": "向右1",
+      "font_class": "xiangyou1",
+      "unicode": "e775",
+      "unicode_decimal": 59253
+    },
+    {
+      "icon_id": "577406",
+      "name": "向左1",
+      "font_class": "xiangzuo1",
+      "unicode": "e779",
+      "unicode_decimal": 59257
+    },
+    {
       "icon_id": "11077391",
       "name": "垃圾桶",
       "font_class": "lajitong",

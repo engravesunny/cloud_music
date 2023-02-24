@@ -12,6 +12,7 @@ export const song = defineStore('song',{
                 playDuration:0,
                 playMode:0,
                 volume:50,
+                randomSongList:[],
                 currentPlayingSong:{},
                 songUrl:''
             },

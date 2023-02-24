@@ -10,7 +10,6 @@ const dblclickSong = async(song) => {
     const isAvailable = await checkSong({
         id:song.id
     })
-    console.log(song);
     if(!isAvailable.data.success){
         return ElMessage('暂无版权')
     }

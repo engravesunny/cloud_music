@@ -6,12 +6,12 @@
         </div>
         <el-scrollbar height="400px">
             <ul v-if="songList.songList.length">
-                <li v-for="(item,index) in songList.songList" :key="index" @click="changePlayingSong(item)">
+                <li v-for="(item,index) in songList.songList" :key="index" @click.stop="changePlayingSong(item)">
                     <div v-if="item.id===songList.currentPlayingSong.id" class="icon iconfont">&#xe62e;</div>
                     <div class="name shenglue">{{ item.name }}</div>
                     <div class="singer shenglue">{{ mulArShow(item.ar) }}</div>
                     <div class="time">{{ formatTime(item.dt) }}</div>
-                    <div class="delete iconfont">&#xe604;</div>
+                    <div class="delete iconfont" @click="deleteSongInList(item)">&#xe604;</div>
                 </li>
             </ul>
         </el-scrollbar>
@@ -54,9 +54,22 @@ const changePlayingSong = (song) =>{
     playSong(song)
 }
 
+// 删除歌曲
+const deleteSongInList = (song) => {
+    console.log(song);
+}
+
 </script>
 
 <style lang="less" scoped>
+.close{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    // background-color: black;
+}
 .songListContainer{
     box-sizing: border-box;
     padding: 25px 0 0px 15px;

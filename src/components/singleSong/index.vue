@@ -47,7 +47,7 @@
                 :pager-count="11"
                 :current-page="currentPages+1"
                 layout="prev, pager, next"
-                :total="songTotal.value"
+                :total="songTotal"
                 @current-change="currentChange"
             />
         </div>
@@ -173,6 +173,7 @@ const currentChange = (page)=>{
             display: flex;
             line-height: 40px;
             box-sizing: border-box;
+            cursor: pointer;
             .option{
                 box-sizing: border-box;
                 padding-left: 70px;

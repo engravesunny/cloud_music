@@ -17,14 +17,12 @@ const nextSong = (isOK) => {
             let next = 0
             songInfo.value.songList.forEach((item,index) => {
                 if(item.id === songInfo.value.currentPlayingSong.id) {
-                    console.log(index);
                     next = index + 1
                 }
             });
             if(next-1 === songInfo.value.songList.length-1) {
                 next = 0
             }
-            console.log(next);
             playSong(songInfo.value.songList[next])
         } else {
             return 
@@ -40,9 +38,7 @@ const nextSong = (isOK) => {
             });
             if(next === -1) {
                 next = songInfo.value.songList.length-1
-                console.log(next);
             }
-            console.log(next);
             playSong(songInfo.value.songList[next])
         } else {
             return 

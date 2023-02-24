@@ -17,7 +17,27 @@ const routes = [
                 path:"/search",
                 name:'search',
                 component: ()=>import('@/view/Search/index.vue')
-            }
+            },
+            {
+                path:"/findSong",
+                name:'findSong',
+                component: ()=>import('@/view/findSong/index.vue')
+            },
+            {
+                path:"/myLike",
+                name:'myLike',
+                component: ()=>import('@/view/myLike/index.vue')
+            },
+            {
+                path:"/suggestSong",
+                name:'suggestSong',
+                component: ()=>import('@/view/suggestSong/index.vue')
+            },
+            {
+                path:"/privateFM",
+                name:'privateFM',
+                component: ()=>import('@/view/privateFM/index.vue')
+            },
         ]
     }
 ];
