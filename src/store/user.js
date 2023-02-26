@@ -6,7 +6,8 @@ export const user = defineStore('user',{
             userInfo:{
                 nickname:'',
                 cookie:'',
-                avatarUrl:''
+                avatarUrl:'',
+                id:''
             }
         }
     },

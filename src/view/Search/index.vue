@@ -112,10 +112,12 @@ const getSearchSongs = async () => {
         offset:(searchPage.value)*100
     })
     const data = res.data
-    data.result.songs.forEach(item=>{
-        searchResult.push(item)
-    })
-    songTotalProp.value = data.result.songCount
+    if(data.result){
+        data.result.songs.forEach(item=>{
+            searchResult.push(item)
+        })
+        songTotalProp.value = data.result.songCount
+    }
 }
 
 // 切换搜索类型
@@ -150,15 +152,17 @@ const changeSearchType = async (e) => {
 }
 
 // 监听路由
-watch(route,async()=>{
-    // 页数置零
-    searchPage.value = 0
-    // 获取歌曲
-    await getSearchSongs()
-    // 歌曲总数更新
-    console.log('更新');
-    songTotal.value = songTotalProp.value
-    console.log(songTotal);
+watch(route,async(val)=>{
+    if(!val.path === '/search'){
+    } else {
+        // 页数置零
+        searchPage.value = 0
+        // 获取歌曲
+        await getSearchSongs()
+        // 歌曲总数更新
+        songTotal.value = songTotalProp.value
+    }
+    
 })
  
 

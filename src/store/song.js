@@ -14,7 +14,9 @@ export const song = defineStore('song',{
                 volume:50,
                 randomSongList:[],
                 currentPlayingSong:{},
-                songUrl:''
+                songUrl:'',
+                FMMode:false,   // 私人FM模式
+                FMList:[]
             },
         }
     },

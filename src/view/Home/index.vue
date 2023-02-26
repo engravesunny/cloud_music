@@ -19,7 +19,6 @@ var mySwiper = new Swiper('.swiper-container', {
 const userStore = user()
 let { userInfo, getUserInfo } = storeToRefs(userStore)
 const changeNum = () => {
-    console.log(getUserInfo)
 }
 
 onMounted(()=>{
@@ -30,6 +29,5 @@ const login =async ()=>{
     const res = await sendCode({
         phone: '18852182238'
     })
-    console.log(res)
 }
 </script>

@@ -16,12 +16,12 @@
 
             <!-- 上一曲、暂停、下一曲 -->
             <div class="songOption">
-                <div class="beforeSong iconfont" @click="beforeSong"><p>&#xe63c;</p></div>
+                <div v-if="!songState.FMList.length" class="beforeSong iconfont" @click="beforeSong"><p>&#xe63c;</p></div>
                 <div class="pause iconfont" @click="changePlayingState">
                     <span v-if="isPlaying">&#xe87a;</span>
                     <span v-else>&#xe87c;</span>
                 </div>
-                <div class="nextSong iconfont" @click="SongEnd"><p>&#xe63e;</p></div>
+                <div v-if="!songState.FMList.length" class="nextSong iconfont" @click="SongEnd"><p>&#xe63e;</p></div>
             </div>
             <!-- 上一曲、暂停、下一曲 -->
 
@@ -36,7 +36,7 @@
             <!-- 进度条、时间 -->
 
             <!-- 播放模式 -->
-            <div class="playMode" @click="changePlayMode">
+            <div v-if="!songState.FMList.length" class="playMode" @click="changePlayMode">
                 <div v-if="songState.playMode===0" class="seqPlay iconfont">&#xea6f;</div>
                 <div v-if="songState.playMode===1" class="loopPlay iconfont">&#xe66c;</div>
                 <div v-if="songState.playMode===2" class="singlePlay iconfont">&#xe66d;</div>
@@ -50,10 +50,11 @@
             <!-- 音量 -->
 
             <!-- 播放列表 -->
-            <div v-if="showSongList" class="close" @click="showSongList = false">
+            <div v-if="showSongList&&!songState.FMMode" class="close" @click="showSongList = false">
                 <songList v-if="showSongList"></songList>
             </div>
-            <div class="playList iconfont" @click="playListShow"><span class="icon">&#xe62d;</span></div>
+            <div v-if="!songState.FMList.length" class="playList iconfont" @click="playListShow"><span class="icon">&#xe62d;</span></div>
+            <div v-else class="playList iconfont" @click="playListShow"><span class="icon"></span></div>
             <!-- 播放列表 -->
     </div>
 </template>
@@ -116,6 +117,8 @@ onBeforeMount(() => {
             songInfo.value = JSON.parse(localStorage.getItem('PLAYING_STATE'))
         }
         songState = songInfo.value
+        songInfo.value.FMList =reactive([])
+        songInfo.value.FMMode =false
     }
 })
 onMounted(()=>{
@@ -138,6 +141,7 @@ const changePlayedTimeLast = (val) => {
     let audio = document.querySelector('audio')
     audio.currentTime = (audio.duration*val)/100
     audio.addEventListener('timeupdate',changeTimeFn)
+    audio.play()
 }
 
 // 音量控制
@@ -233,6 +237,8 @@ const beforeSong = () => {
 // 监听当前播放歌曲url
 watch(()=>songInfo.value.songUrl,async (newval)=>{
     songState = songInfo.value
+    playedTime.value='00:00'
+    playedProgress.value=0
     createAudio(newval)
     const audio = document.querySelector('audio')
     audio.addEventListener('play',()=>{

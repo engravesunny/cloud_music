@@ -20,7 +20,8 @@
                     <div class="option">
                         <div  v-if="item.id===songState.currentPlayingSong.id" class="playingIcon iconfont">&#xe62e;</div>
                         <div v-else class="index">{{ (index+1)<10?'0'+(index+1):(index+1) }}</div>
-                        <div class="iconfont">&#xe8ab;</div>
+                        <div @click="likeIt(item.id,false)" v-if="isLiked(item.id,userlikeIds)" class="iconfont">&#xe8c3;</div>
+                        <div @click="likeIt(item.id,true)" v-else class="iconfont">&#xe8ab;</div>
                     </div>
                     <div class="songName">
                         {{ item.name }}
@@ -54,11 +55,15 @@
         <!-- 列表分页导航 -->
 
         </div>
-
 </template>
 
 <script setup>
+// 引入红心判定工具
+import isLiked from '@/utils/isLiked.js'
+import { toLikeSong, getMyFavourite } from '@/api/myFavourite.js'
 
+// 引入用户信息
+import { user } from '@/store/user.js'
 //  引入element消息提示及loading状态
 import 'element-plus/theme-chalk/el-loading.css';
 import 'element-plus/theme-chalk/el-message-box.css';
@@ -69,23 +74,23 @@ import { search, getSongUrl, checkSong } from '@/api/search'
 
 import formatTime from '@/utils/formatTime.js'
 
-
 // 分割多歌手工具
 import mulArShows from '@/utils/mulArShow.js'
-
 
 // 引入歌曲播放函数
 import dblclickSong from '@/utils/playSong.js'
 
-
 // 引入底部播放栏状态信息
 import { song } from '@/store/song.js'
 import { storeToRefs } from 'pinia'
-
 const songStore = song()
-
 let { songInfo } = storeToRefs(songStore)
 
+// 用户相关信息
+const userStore = user()
+const { userInfo } = storeToRefs(userStore)
+
+// 分割多歌手工具
 const mulArShow = mulArShows
 
 let songState = reactive({})
@@ -117,23 +122,44 @@ let props = defineProps(['result','songTotal','currentPages'])
 const emit = defineEmits(['updatePage'])
 
 let results = computed(()=>{ return result })
-
-
-
 // 页码改变
 const currentChange = (page)=>{
-    console.log(page);
     currentPage.value = page
     emit('updatePage',currentPage)
 }
 
+// 用户喜欢歌曲id列表
+let userlikeIds = reactive([])
 
+// 获取用户喜欢列表
+const getLikeIds =async () => {
+    const {data} = await getMyFavourite({
+        uid:userInfo.value.id
+    })
+    if(data.ids){
+        data.ids.map(item=>{
+            userlikeIds.push(item)
+        })
+    }
+}
+// 用户点击喜欢
+const likeIt = async(id,like) => {
+    const res = await toLikeSong({
+        id,like
+    })
+    getLikeIds()
+    router.go(0)
+}
+onMounted(async()=>{
+    getLikeIds()
+})
 </script>
 
 <style lang="less" scoped>
 .singleSongContainer{
     width: 100%;
     height: 100%;
+    min-width: 962px;
     .singleSongTitle{
         display: flex;
         justify-content: flex-start;
@@ -188,6 +214,7 @@ const currentChange = (page)=>{
                 }
                 .iconfont{
                     margin-left:28px;
+                    color: red;
                     cursor: pointer;
                 }
             }

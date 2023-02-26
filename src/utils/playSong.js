@@ -6,7 +6,7 @@ const songStore = song()
 
 let { songInfo } = storeToRefs(songStore)
 
-const dblclickSong = async(song) => {
+const playSong = async(song) => {
     const isAvailable = await checkSong({
         id:song.id
     })
@@ -15,16 +15,30 @@ const dblclickSong = async(song) => {
     }
     // 信息赋值到状态
     songInfo.value.name = song.name
-    songInfo.value.picUrl = song.al.picUrl
-    songInfo.value.ar = song.ar
-    songInfo.value.playDuration = song.dt
+    songInfo.value.picUrl = song?.al?.picUrl||song?.album?.picUrl
+    songInfo.value.ar = song.ar||song.artists
+    songInfo.value.playDuration = song?.dt||song.duration
     // 搜索歌曲插入播放列表,id相同歌曲删除
-    if(songInfo.value.songList.length){
-        if(!songInfo.value.songList.some(item=>item.id === song.id)){
+    if(!songInfo.value.FMMode){
+        // 不是FM模式
+        songInfo.value.FMList = reactive([])
+        if(songInfo.value.songList.length){
+            if(!songInfo.value.songList.some(item=>item.id === song.id)){
+                songInfo.value.songList.push(song)
+            }
+        } else {
             songInfo.value.songList.push(song)
         }
     } else {
-        songInfo.value.songList.push(song)
+        // FM模式
+        console.log(songInfo.value.FMList);
+        if(songInfo?.value?.FMList?.length){
+            if(!songInfo.value.FMList.some(item=>item.id === song.id)){
+                songInfo.value.FMList.push(song)
+            }
+        } else {
+            songInfo.value.FMList.push(song)
+        }
     }
     // 切换当前播放歌曲
     songInfo.value.currentPlayingSong = song
@@ -38,4 +52,4 @@ const dblclickSong = async(song) => {
     localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
 }
 
-export default dblclickSong
+export default playSong

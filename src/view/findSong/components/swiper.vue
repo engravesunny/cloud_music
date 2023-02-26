@@ -98,7 +98,7 @@
   .carousel-container {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: 380px;
     overflow: hidden;
   }
   

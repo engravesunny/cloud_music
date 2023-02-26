@@ -2,6 +2,8 @@ import axios from 'axios'
 
 const request = axios.create({
     baseURL:'/api',
+    // baseURL:'http://localhost:4000/',
+    // baseURL:'http://47.93.87.206:3000/',
     withCredentials: true,
     timeout:10000
 })
@@ -26,6 +28,10 @@ request.interceptors.request.use(config => {
 
 // 响应拦截
 request.interceptors.response.use(response=>{
+  const cookie = response.headers['set-cookie']
+  if(cookie) {
+    document.cookie = cookie
+  }
     return response;
 }, error => {
     return Promise.reject(error);

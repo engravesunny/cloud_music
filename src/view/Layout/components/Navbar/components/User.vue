@@ -81,6 +81,7 @@ const Logout =async () => {
         localStorage.removeItem('CLOUD_MUSIC')
         userInfos.nickname = ''
         userInfos.avatarUrl = ''
+        userInfos.id = ''
         ElMessage({
             message: '登出成功',
             type: 'success',

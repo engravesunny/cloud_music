@@ -3,11 +3,10 @@
         <h2>
             {{title}}
         </h2>
-        <div class="playlist_container">
+        <div v-loading="!suggestLists.length" class="playlist_container">
             <ul>
-                <li class="suggestList">每日推荐</li>
                 <li v-for="item in suggestLists" :key="item.id">
-                    <img :src="item.picUrl" alt="">
+                    <el-image loading="lazy" fit="cover" style="width: 100%;border-radius:10px;" :src="suggestLists.length<=20?item.picUrl:item.coverImgUrl" lazy />
                     <div class="name">{{item.name}}</div>
                 </li>
             </ul>
@@ -16,10 +15,11 @@
 </template>
 
 <script setup>
+import { getCurrentInstance } from 'vue';
+
 let props = defineProps(['suggestLists','title'])
-onMounted(()=>{
-    // console.log(highPlayList);
-})
+
+
 </script>
 
 <style lang="less" scoped> 
@@ -28,21 +28,20 @@ onMounted(()=>{
     ul{
         display: flex;
         flex-wrap: wrap;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         width: 100%;
         li{
             margin: 10px;
             width: 17%;
+            height: 20%;
             display: flex;
             justify-content: center;
             flex-direction: column;
             cursor: pointer;
-            img{
-                width: 180px;
-                border-radius: 10px;
-            }
+            transition: all 0.5s;
             .name{
+                width: 180px;
                 height: 40px;
                 padding: 3px;
                 overflow: hidden;
@@ -52,6 +51,9 @@ onMounted(()=>{
                 -webkit-box-orient: vertical;
                 word-break: break-all;  //增加允许在单词内换行
             }
+        }
+        li:hover{
+            width: 20%;
         }
     }
 }
