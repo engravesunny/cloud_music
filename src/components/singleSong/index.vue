@@ -42,7 +42,7 @@
         <!-- 歌曲列表内容 -->
 
         <!-- 列表分页导航 -->
-        <div class="page">
+        <div v-if="songTotal" class="page">
             <el-pagination
                 :page-size="100"
                 :pager-count="11"

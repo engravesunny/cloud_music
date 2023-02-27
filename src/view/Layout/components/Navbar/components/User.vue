@@ -52,20 +52,16 @@
 <script setup>
 import Login from './Login.vue'
 import { logout } from '../../../../../api/user';
-import { user } from '@/store/user';
-import { storeToRefs } from 'pinia';
 import { ElMessage } from 'element-plus'
 import { onMounted, reactive } from '@vue/runtime-core';
-const userStore = user()
-const { getUserInfo, userInfo } = storeToRefs(userStore)
 let userInfos = reactive({
     nickname:'',
     avatarUrl:''
 })
 onMounted(()=>{
     if(localStorage.getItem('userInfo')){
-        userInfos.nickname = JSON.parse(localStorage.getItem('userInfo')).nickname
-        userInfos.avatarUrl = JSON.parse(localStorage.getItem('userInfo')).avatarUrl
+        userInfos.nickname = JSON.parse(localStorage.getItem('userInfo'))?.nickname
+        userInfos.avatarUrl = JSON.parse(localStorage.getItem('userInfo'))?.avatarUrl
     }
 })
 

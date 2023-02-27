@@ -5,7 +5,7 @@
         </h2>
         <div v-loading="!suggestLists.length" class="playlist_container">
             <ul>
-                <li v-for="item in suggestLists" :key="item.id">
+                <li @click="toSongList(item.id)" v-for="item in suggestLists" :key="item.id">
                     <el-image loading="lazy" fit="cover" style="width: 100%;border-radius:10px;" :src="suggestLists.length<=20?item.picUrl:item.coverImgUrl" lazy />
                     <div class="name">{{item.name}}</div>
                 </li>
@@ -16,9 +16,16 @@
 
 <script setup>
 import { getCurrentInstance } from 'vue';
-
+const router = useRouter()
 let props = defineProps(['suggestLists','title'])
-
+let toSongList = (id) => {
+    router.push({
+        path:'/songlist',
+        query:{
+            songListInfoId:id
+        }
+    })
+}
 
 </script>
 

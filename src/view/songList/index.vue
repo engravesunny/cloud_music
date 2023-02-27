@@ -1,8 +1,8 @@
 <template>
     <el-scrollbar>
-    <div>
-      <songListPage :songListInfo="songListInfo"></songListPage>
-    </div>
+      <div>
+        <songListPage :songListInfo="songListInfo"></songListPage>
+      </div>
   </el-scrollbar>
 </template>
 
@@ -21,10 +21,12 @@ onMounted(async()=>{
     const {data} = await getSongListDetail({
         id:songlistId.value
     })
+    console.log(data);
     songListInfo.push(data.playlist)
 })
 
 watch(route,async(val)=>{
+      if(!val.query.songListInfoId)return
       songlistId.value = val.query.songListInfoId
       const {data} = await getSongListDetail({
           id:songlistId.value
@@ -32,6 +34,6 @@ watch(route,async(val)=>{
       songListInfo.pop()
       songListInfo.push(data.playlist)
 },{
-  deep:true,
+      deep:true
 })
 </script>

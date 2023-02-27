@@ -4,19 +4,19 @@
             <swiper :items="bannerList"></swiper>
 
             <!-- 每日推荐 -->
-            <div class="suggest_playlist">
+            <div v-if="dailyList.length" class="suggest_playlist">
                 <suggestList :suggestLists="dailyList" :title="dailyListTitle"></suggestList>
             </div>
             <!-- 每日推荐 -->
 
             <!-- 推荐歌单 -->
-            <div class="suggest_playlist">
+            <div v-if="suggestLists.length" class="suggest_playlist">
                 <suggestList :suggestLists="suggestLists" :title="suggestListsTitle"></suggestList>
             </div>
             <!-- 推荐歌单 -->
 
             <!-- 精品歌单 -->
-            <div class="suggest_playlist">
+            <div v-if="highPlayList.length" class="suggest_playlist">
                 <suggestList :suggestLists="highPlayList" :title="highPlayListTitle"></suggestList>
             </div>
             <!-- 精品歌单 -->
@@ -49,7 +49,7 @@ onMounted(async()=>{
 
     // 获取每日推荐歌单
     const res3 = await getDailySongs()
-    res3.data.recommend.forEach((item,index)=>{
+    res3?.data?.recommend?.forEach((item,index)=>{
         if(index <= 9){
             dailyList.push(item)
         }
@@ -60,7 +60,7 @@ onMounted(async()=>{
     const res2 = await getDailyList({
         limit:10
     })
-    res2.data.result.forEach((item,index)=>{
+    res2?.data?.result?.forEach((item,index)=>{
         suggestLists.push(item)
     })
 
@@ -69,7 +69,7 @@ onMounted(async()=>{
         limit:50,
         cat:'ACG'
     })
-    res1.data.playlists.forEach((item,index)=>{
+    res1?.data?.playlists?.forEach((item,index)=>{
         highPlayList.push(item)
     })
 })
@@ -77,6 +77,8 @@ onMounted(async()=>{
 const userInfo =async () => {
     const res = await getUserInfoDetail()
 }
+
+
 
 </script>
 

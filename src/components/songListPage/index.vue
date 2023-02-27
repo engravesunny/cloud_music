@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading||!songList_info[0]" class="songListPage_container unselectable">
+    <div v-infinite-scroll="load" v-loading="loading||!songList_info[0]" class="songListPage_container unselectable">
         <!-- 歌单信息 -->
         <div v-if="songList_info[0]" class="songList_Info">
             <!-- 歌单封面（左边） -->
@@ -33,7 +33,7 @@
 
                 <!-- 播放全部按钮 -->
                 <div class="playall_btn">
-                    <el-button @click="playAll(songList)" class="iconfont" type="primary" round style="background:rgba(247, 116, 192,1)">&#xe87c;播放全部</el-button>
+                    <el-button @click="playAllFn" class="iconfont" type="primary" round style="background:rgba(247, 116, 192,1)">&#xe87c;播放全部</el-button>
                 </div>
                 <!-- 播放全部按钮 -->
 
@@ -58,6 +58,9 @@
         <!-- 歌曲列表 -->
         <singleSong v-loading="!songList.length" :songTotal="0" :current-pages="0" :result="songList"></singleSong>
         <!-- 歌曲列表 -->
+        <!-- 加载状态 -->
+        <p class="loading" v-if="isloading">Loading...</p>
+        <p class="loading" v-if="finished">已经没有了哦</p>
     </div>
 </template>
 
@@ -71,42 +74,75 @@ const props = defineProps(['songListInfo'])
 let timer = null
 let loading = ref(false)
 let songList = reactive([])
+let offset = ref(0)
+let isMounted = ref(false)
+let isloading = ref(false)
+let finished = ref(false)
+
+let playAllFn = async() => {
+    ElMessage('正在加载全部歌曲')
+    const res = await getSongListAllSong({
+        id:props.songListInfo[0]?.id
+    })
+    ElMessage({
+        type:'success',
+        message:'加载成功'
+    })
+    playAll(res.data?.songs)
+}
+
+const load = async() => {
+    if(finished.value)return
+    if(!isMounted.value)return console.log('未加载完成');
+    isloading.value = true
+    offset.value = offset.value+1
+    console.log(offset.value);
+    const res = await getSongListAllSong({
+        id:props.songListInfo[0]?.id,
+        limit:50,
+        offset:offset.value*100
+    })
+    if(res.data?.songs?.length===0&&isMounted.value){
+        finished.value = true
+        isloading.value = false
+        return
+    }
+    res.data?.songs?.map(item=>{
+        songList.push(item)
+    })
+    isloading.value = false
+}
 
 let songList_info = reactive([])
 
-onMounted(async()=>{
-    timer = setInterval(async() => {
-        if(props.songListInfo[0]){
-            clearInterval(timer)
-            timer = null
-            songList_info.push(props.songListInfo[0])
-            const {data} = await getSongListAllSong({
-                id:props.songListInfo[0].id
-            })
-            data.songs.map(item=>{
-                songList.push(item)
-            })
-        }
-    }, 200);
-})
 watch(props,async(val)=>{
+            offset.value = 0
+            console.log('正在加载');
+            isMounted.value = false
             loading.value = true
-            const {data} = await getSongListAllSong({
-                id:val.songListInfo[0].id
+            const res = await getSongListAllSong({
+                id:val?.songListInfo[0]?.id,
+                limit:50,
+                offset:offset.value*100
             })
+            console.log(res);
             songList_info.pop()
             songList_info.push(val.songListInfo[0])
+            console.log('已获取歌单信息',songList_info);
             const num = songList.length
             for(let i=0;i<num;i++){
                 songList.pop()
             }
-            data.songs.map(item=>{
+            res.data?.songs?.map(item=>{
                 songList.push(item)
             })
-            
+            console.log('以获取歌曲列表',songList);
             loading.value = false
+            isMounted.value = true
+            console.log('加载完成');
         },{
-            deep:true
+            deep:true,
+            immediate:false
         })
 
 </script>
@@ -116,6 +152,7 @@ watch(props,async(val)=>{
     width: 100%;
     display: flex;
     flex-direction: column;
+    padding-bottom: 75px;
     .songList_Info {
         width: 100%;
         height: 300px;
@@ -175,6 +212,13 @@ watch(props,async(val)=>{
                 }
             }
         }
+    }
+    .loading{
+        width: 100%;
+        height: 75px;
+        line-height: 75px;
+        text-align: center;
+        color: gray;
     }
 }
 </style>

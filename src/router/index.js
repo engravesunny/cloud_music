@@ -1,3 +1,4 @@
+import { ElMessage } from "element-plus";
 import { createRouter, createWebHistory } from "vue-router";
 
 
@@ -64,5 +65,22 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 });
+
+const routeNeedToken = ["/myLike","/suggestSong","/songList"]
+
+router.beforeEach((to,from,next)=>{
+    if(routeNeedToken.indexOf(to.fullPath)>-1){
+        // 未登录
+        if(!localStorage.getItem('userInfo')){
+            ElMessage('请您先登录')
+            next('/findSong')
+        } else {
+            next()
+        }
+    }else {
+        next()
+    }
+})
+
 
 export default router;

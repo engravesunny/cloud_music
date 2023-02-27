@@ -11,5 +11,8 @@ const startFM = (isFM) => {
     songInfo.value.FMList = reactive([])
     songInfo.value.songList = [];
     localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
+    if(!isFM){
+        songInfo.value.songList.push(songInfo.value.currentPlayingSong)
+    }
 }
 export default startFM

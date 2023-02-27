@@ -11,10 +11,6 @@ export const user = defineStore('user',{
             }
         }
     },
-    getters:{
-        getUserInfo(){
-            return this.userInfo
-        }
-    },
+    getters:{},
     actions:{}
 })

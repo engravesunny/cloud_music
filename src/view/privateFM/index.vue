@@ -6,7 +6,7 @@
                 <!-- 左侧歌曲封面和操作按钮 -->
                 <div class="options_left">
                     <div class="img">
-                        <el-image loading="lazy" style="border-radius:10px" :src="FMInfo[index].album.picUrl" alt="" ></el-image>
+                        <el-image style="border-radius:10px" :src="FMInfo[index].album.picUrl" alt="" ></el-image>
                         <div class="playbtn"></div>
                     </div>
                     <div class="btn">

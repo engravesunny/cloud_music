@@ -2,7 +2,7 @@
     <div class="songListContainer unselectable">
         <div class="listTitle unselectable">
             <h3>当前播放 {{ ' '+songList.songList.length+ ' ' }}首</h3>
-            <div class="clear">清除全部</div>
+            <div class="clear" @click.stop="deleteAllSongs">清除全部</div>
         </div>
         <el-scrollbar height="400px">
             <ul v-if="songList.songList.length">
@@ -11,7 +11,7 @@
                     <div class="name shenglue">{{ item.name }}</div>
                     <div class="singer shenglue">{{ mulArShow(item.ar||item.artists) }}</div>
                     <div class="time">{{ formatTime(item.dt||item.duration) }}</div>
-                    <div class="delete iconfont" @click="deleteSongInList(item)">&#xe604;</div>
+                    <div class="delete iconfont" @click.stop="deleteSongInList(item)">&#xe604;</div>
                 </li>
             </ul>
         </el-scrollbar>
@@ -56,10 +56,15 @@ const changePlayingSong = (song) =>{
 
 // 删除歌曲
 const deleteSongInList = (song) => {
-    songInfo.value.songList = songInfo.value.songList.filter(item=>{
-        return item.id === song.id
-        console.log(item.id,song.id);
-    })
+    const index = songInfo.value.songList.indexOf(song)
+    console.log(index);
+    songInfo.value.songList.splice(index,index)
+}
+
+// 删除全部
+const deleteAllSongs = () => {
+    console.log(songInfo.value.songList.length);
+    songInfo.value.songList.splice(0,songInfo.value.songList.length)
 }
 
 </script>

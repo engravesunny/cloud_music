@@ -97,12 +97,14 @@ let toSongList = (id) => {
 
 onMounted(async ()=>{
     if(!userInfo.value.nickname){
-        userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+        if(localStorage.getItem('userInfo')){
+            userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+        }
     }
     const {data} = await getUserSongList({
         uid:userInfo.value.id
     })
-    data.playlist.map(item=>{
+    data?.playlist?.map(item=>{
         if(item.creator.nickname === userInfo.value.nickname){
             createSongList.push(item)
         } else {

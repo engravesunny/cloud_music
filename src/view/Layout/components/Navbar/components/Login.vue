@@ -111,6 +111,13 @@ onMounted(async ()=>{
             userInfos.user_name = data.nickname
             // 添加localStorage
         } else if(data.code === 803){
+            console.log(data.cookie);
+            const cookie = data.cookie
+            const cookieFaker = cookie.split('HTTPOnly;')
+            console.log(cookieFaker);
+            cookieFaker.forEach(item => {
+                document.cookie = item
+            });
             qrStatus.value = '登陆成功'
             ElMessage({
                 message:'登陆成功',
@@ -129,7 +136,8 @@ onMounted(async ()=>{
                 nickname:userInfo.value.nickname,
                 id:userInfo.value.id
             }))
-            router.go(0)  // 刷新页面
+            console.log('成功');
+            // router.go(0)  // 刷新页面
             clearInterval(qrTimer)
             const timer = setTimeout(()=>{
                 // 更新状态
