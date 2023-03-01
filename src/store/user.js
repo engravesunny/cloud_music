@@ -6,14 +6,11 @@ export const user = defineStore('user',{
             userInfo:{
                 nickname:'',
                 cookie:'',
-                avatarUrl:''
+                avatarUrl:'',
+                id:''
             }
         }
     },
-    getters:{
-        getUserInfo(){
-            return this.userInfo
-        }
-    },
+    getters:{},
     actions:{}
 })

@@ -11,8 +11,9 @@ import Inspect from 'vite-plugin-inspect'
 const pathSrc = path.resolve(__dirname, 'src')
 
 export default defineConfig({
+  publicDir:'/',
   server:{
-    port: 3000,
+    port: 4000,
     proxy: {
       '/api': {
         target: 'http://47.93.87.206:3000/',

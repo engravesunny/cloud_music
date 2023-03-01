@@ -51,3 +51,9 @@ export const qrCheck = params => request({
 export const logout = () => request({
     url:"/logout"
 })
+
+// 获取用户信息
+
+export const getUserInfoDetail = () => request({
+    url:'/user/account'
+})

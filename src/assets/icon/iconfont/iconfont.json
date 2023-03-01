@@ -6,6 +6,118 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4510299",
+      "name": "语音关闭",
+      "font_class": "yuyinguanbi",
+      "unicode": "e903",
+      "unicode_decimal": 59651
+    },
+    {
+      "icon_id": "33987013",
+      "name": "关闭",
+      "font_class": "guanbi",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "33987164",
+      "name": "下拉",
+      "font_class": "a-xiala2",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
+      "icon_id": "33987167",
+      "name": "编辑",
+      "font_class": "bianji",
+      "unicode": "e629",
+      "unicode_decimal": 58921
+    },
+    {
+      "icon_id": "33987169",
+      "name": "进入",
+      "font_class": "jinru",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
+      "icon_id": "33987170",
+      "name": "下拉",
+      "font_class": "xiala",
+      "unicode": "e62b",
+      "unicode_decimal": 58923
+    },
+    {
+      "icon_id": "33987171",
+      "name": "提示",
+      "font_class": "tishi",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "33997760",
+      "name": "书吧",
+      "font_class": "shuba",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
+      "icon_id": "777843",
+      "name": "赞",
+      "font_class": "icon",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "6380878",
+      "name": "点赞_块",
+      "font_class": "dianzan_kuai",
+      "unicode": "ec8c",
+      "unicode_decimal": 60556
+    },
+    {
+      "icon_id": "6539429",
+      "name": "日历",
+      "font_class": "rili",
+      "unicode": "e685",
+      "unicode_decimal": 59013
+    },
+    {
+      "icon_id": "586863",
+      "name": "dot",
+      "font_class": "dot",
+      "unicode": "e711",
+      "unicode_decimal": 59153
+    },
+    {
+      "icon_id": "577402",
+      "name": "向右1",
+      "font_class": "xiangyou1",
+      "unicode": "e775",
+      "unicode_decimal": 59253
+    },
+    {
+      "icon_id": "577406",
+      "name": "向左1",
+      "font_class": "xiangzuo1",
+      "unicode": "e779",
+      "unicode_decimal": 59257
+    },
+    {
+      "icon_id": "11077391",
+      "name": "垃圾桶",
+      "font_class": "lajitong",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "5023691",
+      "name": "正在播放",
+      "font_class": "zhengzaibofang",
+      "unicode": "e62e",
+      "unicode_decimal": 58926
+    },
+    {
       "icon_id": "1304951",
       "name": "列表",
       "font_class": "liebiao",

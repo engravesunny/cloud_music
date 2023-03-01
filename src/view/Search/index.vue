@@ -55,16 +55,26 @@ const searchType = ref(1)
 const searchTypeComponent = shallowRef(singleSong)
 // 搜索页码
 let searchPage = ref(0)
+
+// 接口有问题，搜索结果总数只接受第一次返回数据
 // 搜索结果总数
-let songTotal = reactive({
-    value:0
+let songTotal = ref(100)
+
+// 搜索结果总数 桥梁
+
+let songTotalProp = reactive({
+    value:100
 })
+
+// 剩余歌曲数目
+let restSongCount = ref(100)
 // 展示搜索结果
 let showResult = ref(false)
 // 初始化
-onMounted(()=>{
+onBeforeMount(async()=>{
     // 初始化获取歌曲
-    getSearchSongs()
+    await getSearchSongs()
+    songTotal.value = songTotalProp.value
     showResult.value = true
 })  
 
@@ -96,15 +106,18 @@ const getSearchSongs = async () => {
     searchResult = reactive([])
     const { searchValue } = route.query
     testSearchText.value = searchValue
-    const {data} = await search({
+    const res = await search({
         keywords:searchValue,
-        limit:100,
-        offset:searchPage.value*100
+        limit:restSongCount.value<100?restSongCount.value:100,
+        offset:(searchPage.value)*100
     })
-    data.result.songs.forEach(item=>{
-        searchResult.push(item)
-    })
-    songTotal.value = data.result.songCount
+    const data = res.data
+    if(data.result){
+        data.result.songs.forEach(item=>{
+            searchResult.push(item)
+        })
+        songTotalProp.value = data.result.songCount
+    }
 }
 
 // 切换搜索类型
@@ -139,13 +152,25 @@ const changeSearchType = async (e) => {
 }
 
 // 监听路由
-watch(route,()=>{getSearchSongs()})
+watch(route,async(val)=>{
+    if(!val.path === '/search'){
+    } else {
+        // 页数置零
+        searchPage.value = 0
+        // 获取歌曲
+        await getSearchSongs()
+        // 歌曲总数更新
+        songTotal.value = songTotalProp.value
+    }
+    
+})
  
 
 // 改变页码
 const changePage =async (e) => {
     searchPage.value = e.value - 1
-    await getSearchSongs()    
+    restSongCount.value =songTotal.value - (e.value - 1)*100
+    await getSearchSongs() 
 }
 
 </script>
@@ -178,6 +203,7 @@ const changePage =async (e) => {
                 height: 100%;
                 padding: 13px;
                 transition: all 0.1s;
+                cursor: pointer;
             }
             .active{
                 font-size: 17px;

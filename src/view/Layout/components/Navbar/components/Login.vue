@@ -42,7 +42,7 @@ import 'element-plus/theme-chalk/el-message-box.css';
 import 'element-plus/theme-chalk/el-message.css';
 
 //  二维码转图片库
-import { qrKey, qrCreate, qrCheck } from '@/api/user.js'
+import { qrKey, qrCreate, qrCheck, getUserInfoDetail } from '@/api/user.js'
 import { reactive } from '@vue/reactivity'
 import QRCode from 'qrcode'
 import { ElMessage } from 'element-plus'
@@ -51,7 +51,6 @@ import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
-console.log(route,router);
 const userStore = user()
 let { userInfo, getUserInfo } = storeToRefs(userStore)
 // 接收父组件传来的值
@@ -97,7 +96,6 @@ onMounted(async ()=>{
     // 循环调用二维码监测接口，直到登录成功
     let qrTimer = setInterval(async () => {
         const {data} = await qrCheck({key})
-        console.log(data);
         if(data.code === 800){
             qrStatus.value = '二维码已过期'
         } else if(data.code === 801){
@@ -112,24 +110,29 @@ onMounted(async ()=>{
             userInfos.user_avatar = data.avatarUrl
             userInfos.user_name = data.nickname
             // 添加localStorage
-            const localInfo = JSON.stringify(data)
-            localStorage.setItem('userInfo',localInfo)
         } else if(data.code === 803){
+            console.log(data.cookie);
+            document.cookie = data.cookie
             qrStatus.value = '登陆成功'
             ElMessage({
                 message:'登陆成功',
                 type:'success'
             })
-
-            // 添加cookie
-            document.cookie=data.cookie
-            // 添加cookie到token
+            // 获取用户信息
+            const res = await getUserInfoDetail()
+            // 添加cookie到token,存入用户信息
             localStorage.setItem('CLOUD_MUSIC',data.cookie)
             userInfo.value.nickname = userInfos.user_name
             userInfo.value.avatarUrl = userInfos.user_avatar
             userInfo.value.cookie = data.cookie
+            userInfo.value.id = res.data.account.id
+            localStorage.setItem('userInfo',JSON.stringify({
+                avatarUrl:userInfo.value.avatarUrl,
+                nickname:userInfo.value.nickname,
+                id:userInfo.value.id
+            }))
+            console.log('成功');
             router.go(0)  // 刷新页面
-            console.log(userInfo);
             clearInterval(qrTimer)
             const timer = setTimeout(()=>{
                 // 更新状态

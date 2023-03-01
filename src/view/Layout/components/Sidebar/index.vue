@@ -7,7 +7,7 @@
                 <!-- 使用v-for渲染左边栏按钮 -->
                 <div class="side_top">
                     <div 
-                        :class="{side_cell:true,active:item.active}" 
+                        :class="{side_cell:true,active:(item.active&&route.meta.component===item.path)||route.meta.component===item.path}" 
                         v-for="item in sideCellList" 
                         :key="item.name"
                         @click="toCell(item)"
@@ -20,12 +20,12 @@
                 <div class="side_bottom">
                     <el-collapse>
                         <el-collapse-item class="song_list" style="font-size: 18px;" title="创建的歌单">
-                            <div class="songList_cell" v-for="item in createSongList" :key="item.id">
+                            <div @click="toSongList(item.id)" class="songList_cell shenglue" v-for="item in createSongList" :key="item.id">
                                 {{ item.name }}
                             </div>
                         </el-collapse-item>
                         <el-collapse-item class="song_list" title="收藏的歌单">
-                            <div class="songList_cell" v-for="item in collectSonglist" :key="item.id">
+                            <div @click="toSongList(item.id)" class="songList_cell shenglue" v-for="item in collectSonglist" :key="item.id">
                                 {{ item.name }}
                             </div>
                         </el-collapse-item>
@@ -38,28 +38,35 @@
 </template>
 
 <script setup>
+import { getUserSongList } from '@/api/myFavourite.js'
+import {user} from '@/store/user'
+import { storeToRefs } from 'pinia';
+const userStore  = user()
+const { userInfo } = storeToRefs(userStore)
 
+const route = useRoute()
+const router = useRouter()
 // 左侧栏上部分按钮
 let sideCellList = reactive([
     {
+        name:'发现音乐',
+        active:true, //默认展示发现音乐
+        path:'findSong' 
+    },
+    {
         name:'我的收藏',
-        active:true, //默认展示我的收藏
-        path:'/myLike'
+        active:false, 
+        path:'myLike'
     },
     {
         name:'每日推荐',
         active:false,
-        path:'/suggestSong' 
+        path:'suggestSong' 
     },
     {
         name:'私人FM',
         active:false,
-        path:'/privateFM' 
-    },
-    {
-        name:'播放历史',
-        active:false,
-        path:'/playHistory' 
+        path:'privateFM' 
     }
 ])
 
@@ -69,54 +76,42 @@ const toCell = (item) => {
         item.active = false
     });
     item.active = true
+    router.push(item.path)
 }
 
 // 左侧栏下部分
-let createSongList = reactive([
-    {
-        id:'1',
-        name:'歌单名测试'
-    },
-    {
-        id:'2',
-        name:'歌单名测试'
-    },{
-        id:'3',
-        name:'歌单名测试'
-    },{
-        id:'4',
-        name:'歌单名测试'
-    },{
-        id:'5',
-        name:'歌单名测试'
-    },{
-        id:'6',
-        name:'歌单名测试'
-    },
-])
+let createSongList = reactive([])
 
-let collectSonglist = reactive([
-{
-        id:'1',
-        name:'歌单名测试'
-    },
-    {
-        id:'2',
-        name:'歌单名测试'
-    },{
-        id:'3',
-        name:'歌单名测试'
-    },{
-        id:'4',
-        name:'歌单名测试'
-    },{
-        id:'5',
-        name:'歌单名测试'
-    },{
-        id:'6',
-        name:'歌单名测试'
-    },
-])
+let collectSonglist = reactive([])
+
+// 跳转到歌单页
+
+let toSongList = (id) => {
+    router.push({
+        path:'/songlist',
+        query:{
+            songListInfoId:id
+        }
+    })
+}
+
+onMounted(async ()=>{
+    if(!userInfo.value.nickname){
+        if(localStorage.getItem('userInfo')){
+            userInfo.value = JSON.parse(localStorage.getItem('userInfo'))
+        }
+    }
+    const {data} = await getUserSongList({
+        uid:userInfo.value.id
+    })
+    data?.playlist?.map(item=>{
+        if(item.creator.nickname === userInfo.value.nickname){
+            createSongList.push(item)
+        } else {
+            collectSonglist.push(item)
+        }
+    })
+})
 
 </script>
 
@@ -194,11 +189,14 @@ let collectSonglist = reactive([
                 width: 97%;
                 box-sizing: border-box;
                 padding: 10px 10px;
-                font-size: 16px;
+                font-size: 14px;
                 font-weight: 100;
                 border-radius: 5px;
                 transition: all 0.1s;
                 cursor: pointer;
+            }
+            .songList_cell:hover{
+                background-color: #f4dcdc;
             }
         }
         .el-collapse{

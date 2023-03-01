@@ -16,12 +16,12 @@
 
             <!-- 上一曲、暂停、下一曲 -->
             <div class="songOption">
-                <div class="beforeSong iconfont"><p>&#xe63c;</p></div>
+                <div v-if="!songState.FMList.length" class="beforeSong iconfont" @click="beforeSong"><p>&#xe63c;</p></div>
                 <div class="pause iconfont" @click="changePlayingState">
                     <span v-if="isPlaying">&#xe87a;</span>
                     <span v-else>&#xe87c;</span>
                 </div>
-                <div class="nextSong iconfont"><p>&#xe63e;</p></div>
+                <div v-if="!songState.FMList.length" class="nextSong iconfont" @click="SongEnd"><p>&#xe63e;</p></div>
             </div>
             <!-- 上一曲、暂停、下一曲 -->
 
@@ -36,7 +36,7 @@
             <!-- 进度条、时间 -->
 
             <!-- 播放模式 -->
-            <div class="playMode" @click="changePlayMode">
+            <div v-if="!songState.FMList.length" class="playMode" @click="changePlayMode">
                 <div v-if="songState.playMode===0" class="seqPlay iconfont">&#xea6f;</div>
                 <div v-if="songState.playMode===1" class="loopPlay iconfont">&#xe66c;</div>
                 <div v-if="songState.playMode===2" class="singlePlay iconfont">&#xe66d;</div>
@@ -45,21 +45,34 @@
             <!-- 播放模式 -->
 
             <!-- 音量 -->
+            <volum class="volumeOption" v-if="isChangingVolume"></volum>
             <div class="volume iconfont"><span class="icon">&#xe605;</span></div>
             <!-- 音量 -->
 
             <!-- 播放列表 -->
-            <div class="playList iconfont" @click="playListShow"><span class="icon">&#xe62d;</span></div>
+            <div v-if="showSongList&&!songState.FMMode" class="close" @click="showSongList = false">
+                <songList v-if="showSongList"></songList>
+            </div>
+            <div v-if="!songState.FMList.length" class="playList iconfont" @click="playListShow"><span class="icon">&#xe62d;</span></div>
+            <div v-else class="playList iconfont" @click="playListShow"><span class="icon"></span></div>
             <!-- 播放列表 -->
     </div>
 </template>
 
 <script setup>
-
+// 歌曲列表组件
+import songList from './components/songList.vue'
+// 音量组件
+import volum from './components/volum.vue';
 // 引入时间转换工具
 import formatTime from '../../../../utils/formatTime';
 // 播放url工具
 import createAudio from '../../../../utils/createAudio';
+// 上一首、下一首函数
+import nextSong from '../../../../utils/nextSong'
+// 歌曲结束判定工具
+import songEndFn from '../../../../utils/songEndFn'
+
 
 // 引入api
 import { getSongUrl } from '@/api/search'
@@ -104,8 +117,12 @@ onBeforeMount(() => {
             songInfo.value = JSON.parse(localStorage.getItem('PLAYING_STATE'))
         }
         songState = songInfo.value
+        songInfo.value.FMList =reactive([])
+        songInfo.value.FMMode =false
     }
-    
+})
+onMounted(()=>{
+    changeVolume()
 })
 
 // 已播放时长
@@ -124,16 +141,41 @@ const changePlayedTimeLast = (val) => {
     let audio = document.querySelector('audio')
     audio.currentTime = (audio.duration*val)/100
     audio.addEventListener('timeupdate',changeTimeFn)
+    audio.play()
+}
+
+// 音量控制
+let isChangingVolume = ref(false)
+let changeVolume = () => {
+    let volume = document.querySelector('.volume')
+    volume.addEventListener('mouseover',(e)=>{
+        isChangingVolume.value = true
+        let x = e.clientX
+        let y = e.clientY
+        let Lx = 0
+        let Ly = 0
+        document.onmousemove = (e_e)=>{
+            Lx = Math.abs(e_e.clientX-x)
+            Ly = Math.abs(e_e.clientY-y)
+            if(Lx>40||Ly>200){
+                isChangingVolume.value = false
+                document.onmousemove = null
+            }
+        }
+    })
 }
 
 // 展示播放列表
+let showSongList = ref(false)
 const playListShow = () => {
-    console.log(songState.songList);
+    if(isChangingVolume)isChangingVolume.value = false
+    showSongList.value = !showSongList.value
 }
 
 // 改变播放模式
 const changePlayMode = () => {
-    songInfo.value.playMode++
+    if(isChangingVolume)isChangingVolume.value = false
+    songInfo.value.playMode++;
     if(songInfo.value.playMode===4){
         songInfo.value.playMode = 0
     }
@@ -146,15 +188,59 @@ const changeTimeFn = ()=> {
     playedProgress.value = (audio.currentTime/audio.duration)*100
 }
 
-// 监听当前播放歌曲url
-watch(()=>songInfo.value.songUrl,(newval)=>{
-    console.log('songInfo',newval);
-    createAudio(newval,songState.playMode === 2)
-    const audio = document.querySelector('audio')
-    audio.addEventListener('canplay',()=>{
-        console.log(audio.duration);
+// 节流
+let timer = null
 
-    })
+// 下一曲
+const SongEnd = () => {
+    if(timer){
+        clearTimeout(timer)
+        ElMessage('请不要繁忙点击')
+        timer = null
+    }
+    timer = setTimeout(()=>{
+        songEndFn()
+        clearTimeout(timer)
+        timer = null
+    },200)
+    // 解决多音频
+    const audios = document.querySelectorAll('audio')
+    if(audios.length>1){
+        for(let i = 0;i < audios.length-1;i++){
+            audios[i].remove()
+        }
+    }
+}
+
+// 上一首
+const beforeSong = () => {
+    if(timer){
+        clearTimeout(timer)
+        ElMessage('请不要繁忙点击')
+        timer = null
+    }
+    timer = setTimeout(()=>{
+        nextSong(false)
+        clearTimeout(timer)
+        timer = null
+    },200)
+    // 解决多音频
+    const audios = document.querySelectorAll('audio')
+    if(audios.length>1){
+        for(let i = 0;i < audios.length-1;i++){
+            audios[i].remove()
+        }
+    }
+}
+
+
+// 监听当前播放歌曲url
+watch(()=>songInfo.value.songUrl,async (newval)=>{
+    songState = songInfo.value
+    playedTime.value='00:00'
+    playedProgress.value=0
+    createAudio(newval)
+    const audio = document.querySelector('audio')
     audio.addEventListener('play',()=>{
         isPlaying.value = true
     })
@@ -162,6 +248,13 @@ watch(()=>songInfo.value.songUrl,(newval)=>{
         isPlaying.value = false
     })
     audio.addEventListener('timeupdate',changeTimeFn)
+    // 歌曲结束是的判定函数
+    audio.onended = ()=>{
+        songEndFn()
+        audio.onended = null
+    }
+
+    
 },{
     deep:true,
     immediate:false
@@ -170,6 +263,14 @@ watch(()=>songInfo.value.songUrl,(newval)=>{
 
 
 <style lang="less" scoped>
+.close{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -999;
+}
 .footer{
     display: flex;
     justify-content: flex-start;
