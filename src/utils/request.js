@@ -2,8 +2,8 @@ import axios from 'axios'
 
 const request = axios.create({
     // baseURL:'/api',
-    // baseURL:'http://localhost:4000/',
-    baseURL:'http://47.93.87.206:3000/',
+    baseURL:'http://localhost:3000/',
+    // baseURL:'http://47.93.87.206:3000/',
     withCredentials: true,
     timeout:10000
 })

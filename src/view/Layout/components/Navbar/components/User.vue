@@ -26,10 +26,7 @@
             <div v-if="down_menu_show" class="bg_border" @click="down_menu_show=false">
                 <div v-if="down_menu_show" class="down_menu">
                     <ul>
-                        <li>
-                            个人信息
-                        </li>
-                        <li>
+                        <li @click="about">
                             关于
                         </li>
                         <li @click="Logout">
@@ -46,18 +43,33 @@
         <Login v-if="showLoginBox" v-model:showLoginBox="showLoginBox" ></Login>
 
         <!-- 登录窗口 -->
+
+        <!-- about窗口 -->
+        <div v-if="showAbout" class="about">
+        <!-- <div class="about"> -->
+            <About></About>
+            <div @click="close" class="close iconfont">&#xe903;</div>
+        </div>
+        <!-- about窗口 -->
+
+
     </div>
 </template>
 
 <script setup>
+import About from './About.vue'
 import Login from './Login.vue'
 import { logout } from '../../../../../api/user';
 import { ElMessage } from 'element-plus'
 import { onMounted, reactive } from '@vue/runtime-core';
+import { useRouter } from 'vue-router';
 let userInfos = reactive({
     nickname:'',
     avatarUrl:''
 })
+
+
+const router = useRouter()
 onMounted(()=>{
     if(localStorage.getItem('userInfo')){
         userInfos.nickname = JSON.parse(localStorage.getItem('userInfo'))?.nickname
@@ -67,8 +79,12 @@ onMounted(()=>{
 
 let down_menu_show = ref(false)
 let showLoginBox = ref(false)
+let showAbout = ref(false)
 const login = () => {
     showLoginBox.value = true
+}
+const about = () => {
+    showAbout.value = true
 }
 const Logout =async () => {
     const {data} = await logout()
@@ -78,11 +94,15 @@ const Logout =async () => {
         userInfos.nickname = ''
         userInfos.avatarUrl = ''
         userInfos.id = ''
+        router.push('/findSong')
         ElMessage({
             message: '登出成功',
             type: 'success',
         })
     }
+}
+const close = () => {
+    showAbout.value = false
 }
 </script>
 
@@ -147,6 +167,21 @@ const Logout =async () => {
         left: 0;
         width:100vw;
         height: 100vh;
+    }
+    .about{
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        width: 300px;
+        height: 600px;
+        background-color: #fff;
+        border-radius: 10px;
+        .close{
+            z-index: 999;
+            float: right;
+            margin: 5px;
+        }
     }
 }
 </style>

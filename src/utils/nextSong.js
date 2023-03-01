@@ -27,7 +27,8 @@ const nextSong = (isOK) => {
                 }
                 playSong(songInfo.value.songList[next])
             } else {
-                return 
+                let audio = document.querySelector('audio')
+                audio.remove() 
             }
         } else {
             // 上一首

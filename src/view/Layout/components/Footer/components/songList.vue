@@ -23,7 +23,7 @@
 import formatTime from '../../../../../utils/formatTime';
 import mulArShow from '../../../../../utils/mulArShow';
 import playSong from '../../../../../utils/playSong'
-
+import nextSong from '../../../../../utils/nextSong'
 // 引入底部播放栏状态信息
 import { song } from '@/store/song.js'
 import { storeToRefs } from 'pinia'
@@ -57,14 +57,37 @@ const changePlayingSong = (song) =>{
 // 删除歌曲
 const deleteSongInList = (song) => {
     const index = songInfo.value.songList.indexOf(song)
-    console.log(index);
-    songInfo.value.songList.splice(index,index)
+    if(songInfo.value.songList[index].id === songInfo.value.currentPlayingSong.id){
+        if(!songInfo.value.songList.length){
+            songInfo.value.name = ''
+            songInfo.value.picUrl = ''
+            songInfo.value.ar = []
+            songInfo.value.playDuration = 0
+            songInfo.value.currentPlayingSong = {}
+            nextSong(true)
+        } else {
+            nextSong(true)
+        }
+    }
+    if(index!==0){
+        songInfo.value.songList.splice(index,index)
+    } else {
+        songInfo.value.songList.shift()
+    }
+    localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
 }
 
 // 删除全部
 const deleteAllSongs = () => {
     console.log(songInfo.value.songList.length);
     songInfo.value.songList.splice(0,songInfo.value.songList.length)
+    songInfo.value.name = ''
+    songInfo.value.picUrl = ''
+    songInfo.value.ar = []
+    songInfo.value.playDuration = 0
+    songInfo.value.currentPlayingSong = {}
+    nextSong(true)
+    localStorage.setItem('PLAYING_STATE',JSON.stringify(songInfo.value))
 }
 
 </script>

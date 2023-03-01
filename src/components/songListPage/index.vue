@@ -100,7 +100,7 @@ const load = async() => {
     const res = await getSongListAllSong({
         id:props.songListInfo[0]?.id,
         limit:50,
-        offset:offset.value*100
+        offset:offset.value*50
     })
     if(res.data?.songs?.length===0&&isMounted.value){
         finished.value = true
